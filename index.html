@@ -260,15 +260,15 @@ background: linear-gradient(145deg, #9f7dff, #6328e1);
 <h2>Please enter your Access Key or Admin Password</h2>
 <input type="text" id="accessKeyInput" placeholder="Access Key or Admin Password" autocomplete="off" autocapitalize="none" />
 <div id="keyErrorMessage"></div>
-<button id="submitAccessKeyBtn">Submit</button>
+<button id="submitAccessKeyBtn" type="button">Submit</button>
 </div>
 
-<button id="adminBtn">Admin Panel</button>
+<button id="adminBtn" type="button">Admin Panel</button>
 
 <div id="adminPanel" aria-modal="true" role="dialog" aria-labelledby="adminPanelTitle" aria-hidden="true">
 <h2 id="adminPanelTitle">Admin Panel Login</h2>
 <input type="password" id="adminPassword" placeholder="Enter admin password" autocomplete="off" autocapitalize="none" />
-<button id="loginAdmin">Login</button>
+<button id="loginAdmin" type="button">Login</button>
 
 <div id="keyGenerator" style="display:none;">
 <h3>Generate New Key</h3>
@@ -281,12 +281,12 @@ background: linear-gradient(145deg, #9f7dff, #6328e1);
 <option value="240">240</option>
 <option value="420">420 (7 hours)</option>
 </select>
-<button id="generateKeyBtn">Generate Key</button>
+<button id="generateKeyBtn" type="button">Generate Key</button>
 <p>New Key: <span id="newKey"></span></p>
 
 <h3>Valid Keys</h3>
 <div id="workingKeys"><ul></ul></div>
-<button id="refreshKeysBtn">Refresh Key List</button>
+<button id="refreshKeysBtn" type="button">Refresh Key List</button>
 </div>
 </div>
 
@@ -304,217 +304,218 @@ background: linear-gradient(145deg, #9f7dff, #6328e1);
 <option value="allintext:">allintext:</option>
 <option value="allinurl:">allinurl:</option>
 </select>
-<button id="generateBtn">Generate Query</button>
+<button id="generateBtn" type="button">Generate Query</button>
 <textarea id="resultArea" readonly></textarea>
 </div>
 
 <script type="module">
-// Firebase configuration - replace with your own
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
-import {
-  getFirestore, collection, addDoc, query, where,
-  getDocs, deleteDoc, doc, Timestamp
-} from "https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore.js";
+document.addEventListener("DOMContentLoaded", () => {
+  // Firebase configuration - replace with your own
+  import("https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js").then(({initializeApp}) => {
+    import("https://www.gstatic.com/firebasejs/9.24.0/firebase-firestore.js").then((firestore) => {
+      const {getFirestore, collection, addDoc, query, where, getDocs, Timestamp} = firestore;
 
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_BUCKET",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
+      const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_AUTH_DOMAIN",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_BUCKET",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+      };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const keysCollection = collection(db, "accessKeys");
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+      const keysCollection = collection(db, "accessKeys");
 
-const MASTER_KEY = "48ontop2323";
-const ADMIN_PASSWORD = "48secret48";
+      const MASTER_KEY = "48ontop2323";
+      const ADMIN_PASSWORD = "48secret48";
 
-const loginOverlay = document.getElementById("loginOverlay");
-const accessKeyInput = document.getElementById("accessKeyInput");
-const submitAccessKeyBtn = document.getElementById("submitAccessKeyBtn");
-const keyErrorMessage = document.getElementById("keyErrorMessage");
+      const loginOverlay = document.getElementById("loginOverlay");
+      const accessKeyInput = document.getElementById("accessKeyInput");
+      const submitAccessKeyBtn = document.getElementById("submitAccessKeyBtn");
+      const keyErrorMessage = document.getElementById("keyErrorMessage");
 
-const container = document.getElementById("container");
-const adminBtn = document.getElementById("adminBtn");
-const adminPanel = document.getElementById("adminPanel");
-const adminPasswordInput = document.getElementById("adminPassword");
-const loginAdminBtn = document.getElementById("loginAdmin");
+      const container = document.getElementById("container");
+      const adminBtn = document.getElementById("adminBtn");
+      const adminPanel = document.getElementById("adminPanel");
+      const adminPasswordInput = document.getElementById("adminPassword");
+      const loginAdminBtn = document.getElementById("loginAdmin");
 
-const keyGeneratorSection = document.getElementById("keyGenerator");
-const keyDurationSelect = document.getElementById("keyDuration");
-const generateKeyBtn = document.getElementById("generateKeyBtn");
-const newKeySpan = document.getElementById("newKey");
-const workingKeysDiv = document.getElementById("workingKeys");
-const workingKeysList = workingKeysDiv.querySelector("ul");
-const refreshKeysBtn = document.getElementById("refreshKeysBtn");
+      const keyGeneratorSection = document.getElementById("keyGenerator");
+      const keyDurationSelect = document.getElementById("keyDuration");
+      const generateKeyBtn = document.getElementById("generateKeyBtn");
+      const newKeySpan = document.getElementById("newKey");
+      const workingKeysDiv = document.getElementById("workingKeys");
+      const workingKeysList = workingKeysDiv.querySelector("ul");
+      const refreshKeysBtn = document.getElementById("refreshKeysBtn");
 
-const keywordInput = document.getElementById("keyword");
-const domainExtInput = document.getElementById("domainExt");
-const operatorSelect = document.getElementById("operator");
-const generateBtn = document.getElementById("generateBtn");
-const resultArea = document.getElementById("resultArea");
+      const keywordInput = document.getElementById("keyword");
+      const domainExtInput = document.getElementById("domainExt");
+      const operatorSelect = document.getElementById("operator");
+      const generateBtn = document.getElementById("generateBtn");
+      const resultArea = document.getElementById("resultArea");
 
-let adminLoggedIn = false;
+      let adminLoggedIn = false;
 
-async function checkKeyValid(inputKey) {
-  if (inputKey === MASTER_KEY) return true;
+      async function checkKeyValid(inputKey) {
+        if (inputKey === MASTER_KEY) return true;
 
-  // Query keys by key only, filter expiration client side
-  const q = query(keysCollection, where("key", "==", inputKey));
-  const snapshot = await getDocs(q);
-  if (snapshot.empty) return false;
+        const q = query(keysCollection, where("key", "==", inputKey));
+        const snapshot = await getDocs(q);
+        if (snapshot.empty) return false;
 
-  const nowDate = new Date();
+        const nowDate = new Date();
 
-  for (const doc of snapshot.docs) {
-    const data = doc.data();
-    if (data.expireAt && data.expireAt.toDate() > nowDate) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function formatTimestamp(ts) {
-  if (!ts) return "-";
-  const date = ts.toDate();
-  return date.toLocaleString("en-US", { hour12: false });
-}
-
-async function loadWorkingKeys() {
-  workingKeysList.innerHTML = '';
-  const q = query(keysCollection, where("expireAt", ">=", Timestamp.now()));
-  const snapshot = await getDocs(q);
-
-  const nowDate = new Date();
-  let foundValid = false;
-
-  if (snapshot.empty) {
-    workingKeysList.innerHTML = '<li>No valid keys found.</li>';
-  } else {
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      if (data.expireAt && data.expireAt.toDate() > nowDate) {
-        foundValid = true;
-        const expFormatted = formatTimestamp(data.expireAt);
-        const li = document.createElement("li");
-        li.innerHTML = `<span>${data.key}</span><span class="expireTime">Expires at: ${expFormatted}</span>`;
-        workingKeysList.appendChild(li);
+        for (const doc of snapshot.docs) {
+          const data = doc.data();
+          if (data.expireAt && data.expireAt.toDate() > nowDate) {
+            return true;
+          }
+        }
+        return false;
       }
+
+      function formatTimestamp(ts) {
+        if (!ts) return "-";
+        const date = ts.toDate();
+        return date.toLocaleString("en-US", { hour12: false });
+      }
+
+      async function loadWorkingKeys() {
+        workingKeysList.innerHTML = '';
+        const q = query(keysCollection, where("expireAt", ">=", Timestamp.now()));
+        const snapshot = await getDocs(q);
+
+        const nowDate = new Date();
+        let foundValid = false;
+
+        if (snapshot.empty) {
+          workingKeysList.innerHTML = '<li>No valid keys found.</li>';
+        } else {
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.expireAt && data.expireAt.toDate() > nowDate) {
+              foundValid = true;
+              const expFormatted = formatTimestamp(data.expireAt);
+              const li = document.createElement("li");
+              li.innerHTML = `<span>${data.key}</span><span class="expireTime">Expires at: ${expFormatted}</span>`;
+              workingKeysList.appendChild(li);
+            }
+          });
+          if (!foundValid) {
+            workingKeysList.innerHTML = '<li>No valid keys found.</li>';
+          }
+        }
+      }
+
+      async function generateNewKey() {
+        const durationMinutes = parseInt(keyDurationSelect.value, 10);
+        if (!durationMinutes || durationMinutes <= 0) return;
+
+        const now = new Date();
+        const expireAt = Timestamp.fromDate(new Date(now.getTime() + durationMinutes * 60 * 1000));
+        const newKeyVal = Math.random().toString(36).substring(2, 12);
+
+        try {
+          await addDoc(keysCollection, {
+            key: newKeyVal,
+            expireAt: expireAt
+          });
+          newKeySpan.textContent = newKeyVal;
+          await loadWorkingKeys();
+        } catch (err) {
+          newKeySpan.textContent = "Error creating key";
+          console.error(err);
+        }
+      }
+
+      async function adminLogin() {
+        const pw = adminPasswordInput.value.trim();
+        if (pw === ADMIN_PASSWORD) {
+          adminLoggedIn = true;
+          keyGeneratorSection.style.display = "block";
+          adminPasswordInput.value = "";
+          adminPasswordInput.disabled = true;
+          loginAdminBtn.disabled = true;
+          await loadWorkingKeys();
+        } else {
+          alert("Wrong admin password");
+        }
+      }
+
+      function showAdminPanel() {
+        adminPanel.style.display = "block";
+        adminPanel.setAttribute("aria-hidden", "false");
+        adminPasswordInput.focus();
+      }
+
+      function hideAdminPanel() {
+        adminPanel.style.display = "none";
+        adminPanel.setAttribute("aria-hidden", "true");
+      }
+
+      submitAccessKeyBtn.addEventListener("click", async () => {
+        keyErrorMessage.textContent = "";
+        const key = accessKeyInput.value.trim();
+        if (!key) {
+          keyErrorMessage.textContent = "Please enter a key or password.";
+          return;
+        }
+        submitAccessKeyBtn.disabled = true;
+        const valid = await checkKeyValid(key);
+        submitAccessKeyBtn.disabled = false;
+        if (valid) {
+          loginOverlay.style.display = "none";
+          container.style.display = "block";
+          if (key === ADMIN_PASSWORD || key === MASTER_KEY) {
+            adminBtn.style.display = "block";
+          }
+        } else {
+          keyErrorMessage.textContent = "Invalid or expired key.";
+        }
+      });
+
+      adminBtn.addEventListener("click", () => {
+        showAdminPanel();
+      });
+
+      loginAdminBtn.addEventListener("click", async () => {
+        await adminLogin();
+      });
+
+      generateKeyBtn.addEventListener("click", async () => {
+        await generateNewKey();
+      });
+
+      refreshKeysBtn.addEventListener("click", async () => {
+        await loadWorkingKeys();
+      });
+
+      generateBtn.addEventListener("click", () => {
+        const keyword = keywordInput.value.trim();
+        const domainExt = domainExtInput.value.trim();
+        const operator = operatorSelect.value;
+
+        if (!keyword) {
+          alert("Please enter a keyword.");
+          return;
+        }
+
+        let queryStr = "";
+
+        if (operator === "site:" && domainExt) {
+          queryStr = `${operator}*.${domainExt} ${keyword}`;
+        } else if (operator !== "site:") {
+          queryStr = `${operator}${keyword}`;
+        } else {
+          queryStr = keyword;
+        }
+
+        resultArea.value = queryStr;
+      });
     });
-    if (!foundValid) {
-      workingKeysList.innerHTML = '<li>No valid keys found.</li>';
-    }
-  }
-}
-
-async function generateNewKey() {
-  const durationMinutes = parseInt(keyDurationSelect.value, 10);
-  if (!durationMinutes || durationMinutes <= 0) return;
-
-  const now = new Date();
-  const expireAt = Timestamp.fromDate(new Date(now.getTime() + durationMinutes * 60 * 1000));
-  const newKeyVal = Math.random().toString(36).substring(2, 12); // 10 chars
-
-  try {
-    await addDoc(keysCollection, {
-      key: newKeyVal,
-      expireAt: expireAt
-    });
-    newKeySpan.textContent = newKeyVal;
-    loadWorkingKeys();
-  } catch (err) {
-    newKeySpan.textContent = "Error creating key";
-    console.error(err);
-  }
-}
-
-async function adminLogin() {
-  const pw = adminPasswordInput.value.trim();
-  if (pw === ADMIN_PASSWORD) {
-    adminLoggedIn = true;
-    keyGeneratorSection.style.display = "block";
-    adminPasswordInput.value = "";
-    adminPasswordInput.disabled = true;
-    loginAdminBtn.disabled = true;
-    loadWorkingKeys();
-  } else {
-    alert("Wrong admin password");
-  }
-}
-
-function showAdminPanel() {
-  adminPanel.style.display = "block";
-  adminPanel.setAttribute("aria-hidden", "false");
-  adminPasswordInput.focus();
-}
-
-function hideAdminPanel() {
-  adminPanel.style.display = "none";
-  adminPanel.setAttribute("aria-hidden", "true");
-}
-
-submitAccessKeyBtn.addEventListener("click", async () => {
-  keyErrorMessage.textContent = "";
-  const key = accessKeyInput.value.trim();
-  if (!key) {
-    keyErrorMessage.textContent = "Please enter a key or password.";
-    return;
-  }
-  submitAccessKeyBtn.disabled = true;
-  const valid = await checkKeyValid(key);
-  submitAccessKeyBtn.disabled = false;
-  if (valid) {
-    loginOverlay.style.display = "none";
-    container.style.display = "block";
-    if (key === ADMIN_PASSWORD || key === MASTER_KEY) {
-      adminBtn.style.display = "block";
-    }
-  } else {
-    keyErrorMessage.textContent = "Invalid or expired key.";
-  }
-});
-
-adminBtn.addEventListener("click", () => {
-  showAdminPanel();
-});
-
-loginAdminBtn.addEventListener("click", async () => {
-  await adminLogin();
-});
-
-generateKeyBtn.addEventListener("click", async () => {
-  await generateNewKey();
-});
-
-refreshKeysBtn.addEventListener("click", async () => {
-  await loadWorkingKeys();
-});
-
-generateBtn.addEventListener("click", () => {
-  const keyword = keywordInput.value.trim();
-  const domainExt = domainExtInput.value.trim();
-  const operator = operatorSelect.value;
-
-  if (!keyword) {
-    alert("Please enter a keyword.");
-    return;
-  }
-
-  let queryStr = "";
-
-  if (operator === "site:" && domainExt) {
-    queryStr = `${operator}*.${domainExt} ${keyword}`;
-  } else if (operator !== "site:") {
-    queryStr = `${operator}${keyword}`;
-  } else {
-    queryStr = keyword;
-  }
-
-  resultArea.value = queryStr;
+  });
 });
 </script>
 
