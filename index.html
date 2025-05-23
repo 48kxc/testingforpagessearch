@@ -7,344 +7,407 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
 body, html {
-margin: 0; padding: 0; height: 100%;
-background: #1a0b3a;
-color: #ddd;
-font-family: 'Roboto Mono', monospace;
-overflow-x: hidden;
-position: relative;
+  margin: 0; padding: 0; height: 100%;
+  background: #1a0b3a;
+  color: #ddd;
+  font-family: 'Roboto Mono', monospace;
+  overflow-x: hidden;
+  position: relative;
 }
 body::before {
-content: "";
-position: fixed;
-top: 0; left: 0; right: 0; bottom: 0;
-background: radial-gradient(circle, #fff 1px, transparent 1px) repeat;
-background-size: 20px 20px;
-opacity: 0.12;
-animation: starsMove 60s linear infinite;
-z-index: 0;
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle, #fff 1px, transparent 1px) repeat;
+  background-size: 20px 20px;
+  opacity: 0.12;
+  animation: starsMove 60s linear infinite;
+  z-index: 0;
 }
 @keyframes starsMove {
-from { background-position: 0 0; }
-to { background-position: 1000px 1000px; }
+  from { background-position: 0 0; }
+  to { background-position: 1000px 1000px; }
+}
+#accessKeySection {
+  max-width: 400px;
+  margin: 80px auto 30px;
+  background: #2b1a58;
+  padding: 20px 25px;
+  border-radius: 20px;
+  box-shadow:
+    0 0 20px 3px #451f9a,
+    inset 0 0 20px 1px #6c4dc9;
+  text-align: center;
+  z-index: 10;
+  position: relative;
+}
+#accessKeySection input[type=text] {
+  width: 100%;
+  padding: 10px 15px;
+  border-radius: 12px;
+  border: 2px solid #5a3e9c;
+  background: #3f2e6a;
+  color: #ddd;
+  font-size: 1.1em;
+  box-shadow: inset 0 0 6px #6a54ac;
+  margin-bottom: 12px;
+  transition: border-color 0.3s ease;
+}
+#accessKeySection input[type=text]:focus {
+  outline: none;
+  border-color: #b79bff;
+  box-shadow: 0 0 10px #b79bff;
+  background: #4b3a80;
+}
+#accessKeySection button {
+  background: linear-gradient(145deg, #8362ff, #4a31bf);
+  color: #eee;
+  font-weight: 700;
+  font-size: 1.2em;
+  padding: 12px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow:
+    0 5px 15px #4a31bf,
+    inset 0 -3px 8px #8362ff;
+  width: 100%;
+}
+#accessKeySection button:hover {
+  background: linear-gradient(145deg, #9f7dff, #6328e1);
+}
+#accessKeyError {
+  color: #ff7777;
+  margin-top: 8px;
+  min-height: 22px;
+  font-weight: 600;
 }
 #container {
-max-width: 700px;
-background: #2b1a58;
-margin: 50px auto 80px;
-padding: 30px 40px;
-border-radius: 20px;
-box-shadow:
-0 0 20px 3px #451f9a,
-inset 0 0 20px 1px #6c4dc9;
-position: relative;
-z-index: 2;
+  max-width: 700px;
+  background: #2b1a58;
+  margin: 50px auto 80px;
+  padding: 30px 40px;
+  border-radius: 20px;
+  box-shadow:
+    0 0 20px 3px #451f9a,
+    inset 0 0 20px 1px #6c4dc9;
+  position: relative;
+  z-index: 2;
+  display: none;
 }
 h1 {
-text-align: center;
-font-weight: 600;
-font-size: 3em;
-color: #a27eff;
-margin-bottom: 30px;
-text-shadow: 0 0 5px #bf9fff;
+  text-align: center;
+  font-weight: 600;
+  font-size: 3em;
+  color: #a27eff;
+  margin-bottom: 30px;
+  text-shadow: 0 0 5px #bf9fff;
 }
 label {
-display: block;
-margin-top: 18px;
-margin-bottom: 6px;
-font-weight: 600;
-color: #d2c9f7;
+  display: block;
+  margin-top: 18px;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #d2c9f7;
 }
 input[type=text], select {
-width: 100%;
-padding: 10px 15px;
-border-radius: 12px;
-border: 2px solid #5a3e9c;
-background: #3f2e6a;
-color: #ddd;
-font-size: 1.1em;
-box-shadow: inset 0 0 6px #6a54ac;
-transition: border-color 0.3s ease;
+  width: 100%;
+  padding: 10px 15px;
+  border-radius: 12px;
+  border: 2px solid #5a3e9c;
+  background: #3f2e6a;
+  color: #ddd;
+  font-size: 1.1em;
+  box-shadow: inset 0 0 6px #6a54ac;
+  transition: border-color 0.3s ease;
 }
 input[type=text]:focus, select:focus {
-outline: none;
-border-color: #b79bff;
-box-shadow: 0 0 10px #b79bff;
-background: #4b3a80;
+  outline: none;
+  border-color: #b79bff;
+  box-shadow: 0 0 10px #b79bff;
+  background: #4b3a80;
 }
 button {
-margin-top: 25px;
-width: 100%;
-background: linear-gradient(145deg, #8362ff, #4a31bf);
-color: #eee;
-font-weight: 700;
-font-size: 1.2em;
-padding: 12px;
-border: none;
-border-radius: 14px;
-cursor: pointer;
-box-shadow:
-0 5px 15px #4a31bf,
-inset 0 -3px 8px #8362ff;
-transition: background 0.4s ease;
+  margin-top: 25px;
+  width: 100%;
+  background: linear-gradient(145deg, #8362ff, #4a31bf);
+  color: #eee;
+  font-weight: 700;
+  font-size: 1.2em;
+  padding: 12px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow:
+    0 5px 15px #4a31bf,
+    inset 0 -3px 8px #8362ff;
+  transition: background 0.4s ease;
 }
 button:hover {
-background: linear-gradient(145deg, #9f7dff, #6328e1);
+  background: linear-gradient(145deg, #9f7dff, #6328e1);
 }
 textarea {
-margin-top: 25px;
-width: 100%;
-height: 150px;
-background: #3f2e6a;
-border-radius: 12px;
-border: 2px solid #5a3e9c;
-color: #ccc;
-padding: 15px;
-font-family: 'Roboto Mono', monospace;
-font-size: 1.1em;
-box-shadow: inset 0 0 8px #6a54ac;
-resize: none;
+  margin-top: 25px;
+  width: 100%;
+  height: 150px;
+  background: #3f2e6a;
+  border-radius: 12px;
+  border: 2px solid #5a3e9c;
+  color: #ccc;
+  padding: 15px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 1.1em;
+  box-shadow: inset 0 0 8px #6a54ac;
+  resize: none;
 }
 #adminBtn {
-position: fixed;
-top: 20px;
-right: 20px;
-background: #4b3a80;
-color: #ddd;
-border: none;
-padding: 12px 18px;
-border-radius: 16px;
-font-weight: 700;
-cursor: pointer;
-box-shadow:
-0 4px 10px #2f235d,
-inset 0 -2px 5px #6c4dc9;
-transition: background 0.3s ease;
-z-index: 10;
-width: auto;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4b3a80;
+  color: #ddd;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow:
+    0 4px 10px #2f235d,
+    inset 0 -2px 5px #6c4dc9;
+  transition: background 0.3s ease;
+  z-index: 10;
+  width: auto;
 }
 #adminBtn:hover {
-background: #633ec9;
+  background: #633ec9;
 }
 #adminPanel {
-position: fixed;
-top: 50%; left: 50%;
-transform: translate(-50%, -50%);
-background: #2b1a58;
-border-radius: 20px;
-padding: 30px 40px;
-width: 320px;
-box-shadow:
-0 0 30px 5px #6c4dc9,
-inset 0 0 15px #451f9a;
-display: none;
-z-index: 100;
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: #2b1a58;
+  border-radius: 20px;
+  padding: 30px 40px;
+  width: 320px;
+  box-shadow:
+    0 0 30px 5px #6c4dc9,
+    inset 0 0 15px #451f9a;
+  display: none;
+  z-index: 100;
 }
 #adminPanel input[type=password] {
-width: 100%;
-padding: 12px 15px;
-font-size: 1.1em;
-border-radius: 14px;
-border: 2px solid #5a3e9c;
-background: #3f2e6a;
-color: #ddd;
-box-shadow: inset 0 0 6px #6a54ac;
-margin-bottom: 15px;
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 1.1em;
+  border-radius: 14px;
+  border: 2px solid #5a3e9c;
+  background: #3f2e6a;
+  color: #ddd;
+  box-shadow: inset 0 0 6px #6a54ac;
+  margin-bottom: 15px;
 }
 #adminPanel button {
-width: 100%;
-background: #633ec9;
-padding: 12px;
-border-radius: 14px;
-font-weight: 700;
-box-shadow: 0 5px 15px #4a31bf;
+  width: 100%;
+  background: #633ec9;
+  padding: 12px;
+  border-radius: 14px;
+  font-weight: 700;
+  box-shadow: 0 5px 15px #4a31bf;
+  cursor: pointer;
 }
 #keyGenerator {
-margin-top: 20px;
+  margin-top: 20px;
 }
 #newKey {
-margin-top: 12px;
-font-family: 'Roboto Mono', monospace;
-font-weight: 700;
-font-size: 1.1em;
-color: #b79bff;
-word-break: break-word;
+  margin-top: 12px;
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 700;
+  font-size: 1.1em;
+  color: #b79bff;
+  word-break: break-word;
 }
 #workingKeys {
-margin-top: 25px;
-padding: 15px;
-background: #3f2e6a;
-border-radius: 12px;
-border: 2px solid #5a3e9c;
-color: #ccc;
-font-size: 0.95em;
-max-height: 200px;
-overflow-y: auto;
-box-shadow: inset 0 0 8px #6a54ac;
+  margin-top: 25px;
+  padding: 15px;
+  background: #3f2e6a;
+  border-radius: 12px;
+  border: 2px solid #5a3e9c;
+  color: #ccc;
+  font-size: 0.95em;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: inset 0 0 8px #6a54ac;
 }
 #workingKeys ul {
-list-style: none;
-padding-left: 0;
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
 }
 #workingKeys li {
-margin-bottom: 6px;
-word-break: break-all;
-display: flex;
-justify-content: space-between;
-align-items: center;
+  margin-bottom: 6px;
+  word-break: break-all;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 #workingKeys li button.deleteKeyBtn {
-margin-left: 10px;
-background: #c33;
-color: #fff;
-border: none;
-border-radius: 6px;
-padding: 2px 8px;
-cursor: pointer;
-font-weight: 700;
-font-size: 0.85em;
+  margin-left: 10px;
+  background: #c33;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85em;
 }
 #workingKeys li button.deleteKeyBtn:hover {
-background: #a00;
+  background: #a00;
 }
 </style>
 </head>
 <body>
 
+<!-- ACCESS KEY ENTRY SECTION -->
+<div id="accessKeySection">
+  <input type="text" id="accessKeyInput" placeholder="Enter your access key" autocomplete="off" />
+  <button id="accessKeySubmit">Submit Key</button>
+  <div id="accessKeyError"></div>
+</div>
+
+<!-- MAIN INTERFACE, initially hidden -->
+<div id="container">
+  <h1>48 Searcher</h1>
+
+  <label for="keywords">Keywords (space separated)</label>
+  <input type="text" id="keywords" placeholder="e.g. openAI chatbot" />
+
+  <label for="excludeWords">Exclude Words (space separated)</label>
+  <input type="text" id="excludeWords" placeholder="e.g. tutorial example" />
+
+  <label for="siteSearch">Site Search (optional domain or leave blank)</label>
+  <input type="text" id="siteSearch" placeholder="e.g. .com, .pages.dev, or example.com" />
+
+  <label for="fileType">File Type (optional)</label>
+  <input type="text" id="fileType" placeholder="e.g. pdf, docx, ppt" />
+
+  <label for="searchExact">Exact Phrase</label>
+  <input type="text" id="searchExact" placeholder="e.g. artificial intelligence" />
+
+  <label for="intitle">Intitle Keywords (space separated)</label>
+  <input type="text" id="intitle" placeholder="e.g. research paper" />
+
+  <label for="inurl">Inurl Keywords (space separated)</label>
+  <input type="text" id="inurl" placeholder="e.g. blog tutorial" />
+
+  <label for="excludeTerms">Exclude Terms (space separated)</label>
+  <input type="text" id="excludeTerms" placeholder="e.g. scam fake" />
+
+  <button id="generateBtn">Generate Search Query</button>
+
+  <textarea id="result" readonly placeholder="Generated search query appears here..."></textarea>
+</div>
+
+<!-- ADMIN BUTTON -->
 <button id="adminBtn">Admin Panel</button>
 
+<!-- ADMIN PANEL -->
 <div id="adminPanel">
-<input type="password" id="adminPassword" placeholder="Enter admin password" />
-<button id="loginAdmin">Login</button>
-<div id="keyGenerator" style="display:none;">
-<button id="generateKey">Generate Access Key</button>
-<p id="newKey"></p>
-<div id="workingKeys" style="display:none;">
-<strong>Working Keys:</strong>
-<ul id="keysList"></ul>
-</div>
-</div>
-</div>
+  <h2>Admin Panel</h2>
+  <input type="password" id="adminPass" placeholder="Enter admin password" autocomplete="off" />
+  <button id="adminLoginBtn">Login</button>
 
-<div id="container" style="display:none;">
-<h1>48 Searcher</h1>
+  <div id="keyGenerator" style="display:none;">
+    <button id="generateKeyBtn">Generate New Key (7h expiry)</button>
+    <div id="newKey"></div>
+  </div>
 
-<label for="keywords">Keywords (space separated)</label>
-<input type="text" id="keywords" placeholder="e.g. openAI chatbot" />
-
-<label for="excludeWords">Exclude Words (space separated)</label>
-<input type="text" id="excludeWords" placeholder="e.g. tutorial example" />
-
-<label for="siteSearch">Site Search (optional domain or leave blank)</label>
-<input type="text" id="siteSearch" placeholder="e.g. .com, .pages.dev, or example.com" />
-
-<label for="fileType">File Type (optional)</label>
-<input type="text" id="fileType" placeholder="e.g. pdf, docx, ppt" />
-
-<label for="searchExact">Exact Phrase</label>
-<input type="text" id="searchExact" placeholder='e.g. "machine learning"' />
-
-<label for="intitle">Words in Title</label>
-<input type="text" id="intitle" placeholder="e.g. security" />
-
-<label for="inurl">Words in URL</label>
-<input type="text" id="inurl" placeholder="e.g. login" />
-
-<label for="excludeTerms">Exclude Terms</label>
-<input type="text" id="excludeTerms" placeholder="e.g. ads, sponsored" />
-
-<button id="generateBtn">Generate Search Query</button>
-
-<textarea id="result" readonly placeholder="Your advanced search query will appear here..."></textarea>
+  <div id="workingKeys" style="display:none;">
+    <h3>Active Keys</h3>
+    <ul id="keysList"></ul>
+  </div>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-import { getFirestore, collection, addDoc, serverTimestamp, Timestamp, query, where, getDocs, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+// Firebase imports (assumes Firebase SDK v9+ is included via CDN or bundler)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, deleteDoc, doc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
+// Your Firebase config here
 const firebaseConfig = {
-apiKey: "AIzaSyDkU4W01OimygxLlEXBhqrba3PglcV2224",
-authDomain: "searcher-key-sys.firebaseapp.com",
-projectId: "searcher-key-sys",
-storageBucket: "searcher-key-sys.firebasestorage.app",
-messagingSenderId: "500491200168",
-appId: "1:500491200168:web:91ae88fa17f8a8bb6f849d"
+  // Your config here
 };
-
-const MASTER_KEY = "48ontop2323";
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const keysCollection = collection(db, "accessKeys");
 
+// Elements
+const accessKeyInput = document.getElementById('accessKeyInput');
+const accessKeySubmit = document.getElementById('accessKeySubmit');
+const accessKeyError = document.getElementById('accessKeyError');
+const container = document.getElementById('container');
 const adminBtn = document.getElementById('adminBtn');
 const adminPanel = document.getElementById('adminPanel');
-const adminPasswordInput = document.getElementById('adminPassword');
-const loginAdminBtn = document.getElementById('loginAdmin');
-const keyGeneratorDiv = document.getElementById('keyGenerator');
-const generateKeyBtn = document.getElementById('generateKey');
+const adminPassInput = document.getElementById('adminPass');
+const adminLoginBtn = document.getElementById('adminLoginBtn');
+const generateKeyBtn = document.getElementById('generateKeyBtn');
 const newKeyDisplay = document.getElementById('newKey');
 const workingKeysDiv = document.getElementById('workingKeys');
 const keysList = document.getElementById('keysList');
-const container = document.getElementById('container');
+const keyGeneratorDiv = document.getElementById('keyGenerator');
 
-adminBtn.addEventListener('click', () => {
-  if (adminPanel.style.display === 'none' || adminPanel.style.display === '') {
-    adminPanel.style.display = 'block';
-  } else {
-    adminPanel.style.display = 'none';
-  }
-});
+const ADMIN_PASSWORD = "admin123"; // Replace with your actual admin password
+const MASTER_KEY = "48ontop2323"; // Master key for access
 
-let isAdmin = false;
-
-// --- KEY ACCESS CHECK ---
-async function validateAccessKey(userKey) {
-  if (userKey === MASTER_KEY) return true;
+// Validate access key and show main UI if valid
+async function validateKey(key) {
+  if (key === MASTER_KEY) return true;
   try {
     const now = new Date();
-    const q = query(keysCollection, where("key", "==", userKey), where("expireAt", ">", Timestamp.fromDate(now)));
-    const querySnapshot = await getDocs(q);
-    return !querySnapshot.empty;
-  } catch {
+    const q = query(keysCollection, where("key", "==", key), where("expireAt", ">", Timestamp.fromDate(now)));
+    const snapshot = await getDocs(q);
+    return !snapshot.empty;
+  } catch (e) {
+    console.error("Error checking key", e);
     return false;
   }
 }
 
-async function promptForKey() {
-  let tries = 0;
-  while (tries < 5) {
-    const userKey = prompt("Enter your access key:");
-    if (userKey === null) {
-      alert("Access key required to use the site.");
-      continue;
-    }
-    const valid = await validateAccessKey(userKey.trim());
-    if (valid) {
-      container.style.display = 'block';
-      return true;
-    } else {
-      alert("Invalid or expired key, please try again.");
-      tries++;
-    }
+async function onAccessKeySubmit() {
+  accessKeyError.textContent = "";
+  const key = accessKeyInput.value.trim();
+  if (!key) {
+    accessKeyError.textContent = "Please enter an access key.";
+    return;
   }
-  alert("Too many failed attempts. Reload page to try again.");
-  return false;
-}
-await promptForKey();
-// --- END KEY ACCESS CHECK ---
-
-loginAdminBtn.addEventListener('click', () => {
-  const enteredPassword = adminPasswordInput.value.trim();
-  if (enteredPassword === "yourStrongAdminPassword") {  // change this password
-    isAdmin = true;
-    adminPasswordInput.style.display = 'none';
-    loginAdminBtn.style.display = 'none';
-    keyGeneratorDiv.style.display = 'block';
-    workingKeysDiv.style.display = 'block';
-    loadWorkingKeys();
+  const valid = await validateKey(key);
+  if (valid) {
+    document.getElementById('accessKeySection').style.display = 'none';
+    container.style.display = 'block';
   } else {
-    alert('Incorrect admin password.');
+    accessKeyError.textContent = "Invalid or expired key.";
+  }
+}
+accessKeySubmit.addEventListener('click', onAccessKeySubmit);
+accessKeyInput.addEventListener('keydown', e => { if (e.key === "Enter") onAccessKeySubmit(); });
+
+// ADMIN PANEL LOGIC
+adminBtn.addEventListener('click', () => {
+  adminPanel.style.display = adminPanel.style.display === "block" ? "none" : "block";
+  adminPassInput.value = "";
+  keyGeneratorDiv.style.display = "none";
+  workingKeysDiv.style.display = "none";
+  newKeyDisplay.textContent = "";
+});
+
+// Admin login
+adminLoginBtn.addEventListener('click', async () => {
+  if (adminPassInput.value === ADMIN_PASSWORD) {
+    keyGeneratorDiv.style.display = "block";
+    workingKeysDiv.style.display = "block";
+    await loadWorkingKeys();
+  } else {
+    alert("Incorrect admin password.");
   }
 });
 
@@ -366,7 +429,7 @@ generateKeyBtn.addEventListener('click', async () => {
       expireAt: Timestamp.fromDate(new Date(Date.now() + 7 * 3600 * 1000))  // expires in 7 hours
     });
     newKeyDisplay.textContent = `New key generated: ${key}`;
-    loadWorkingKeys();
+    await loadWorkingKeys();
   } catch (e) {
     alert('Error generating key');
     console.error(e);
