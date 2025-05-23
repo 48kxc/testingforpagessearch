@@ -226,7 +226,7 @@ background: #a00;
 </div>
 </div>
 
-<div id="container">
+<div id="container" style="display:none;">
 <h1>48 Searcher</h1>
 
 <label for="keywords">Keywords (space separated)</label>
@@ -286,6 +286,7 @@ const generateKeyBtn = document.getElementById('generateKey');
 const newKeyDisplay = document.getElementById('newKey');
 const workingKeysDiv = document.getElementById('workingKeys');
 const keysList = document.getElementById('keysList');
+const container = document.getElementById('container');
 
 adminBtn.addEventListener('click', () => {
   if (adminPanel.style.display === 'none' || adminPanel.style.display === '') {
@@ -296,6 +297,42 @@ adminBtn.addEventListener('click', () => {
 });
 
 let isAdmin = false;
+
+// --- KEY ACCESS CHECK ---
+async function validateAccessKey(userKey) {
+  if (userKey === MASTER_KEY) return true;
+  try {
+    const now = new Date();
+    const q = query(keysCollection, where("key", "==", userKey), where("expireAt", ">", Timestamp.fromDate(now)));
+    const querySnapshot = await getDocs(q);
+    return !querySnapshot.empty;
+  } catch {
+    return false;
+  }
+}
+
+async function promptForKey() {
+  let tries = 0;
+  while (tries < 5) {
+    const userKey = prompt("Enter your access key:");
+    if (userKey === null) {
+      alert("Access key required to use the site.");
+      continue;
+    }
+    const valid = await validateAccessKey(userKey.trim());
+    if (valid) {
+      container.style.display = 'block';
+      return true;
+    } else {
+      alert("Invalid or expired key, please try again.");
+      tries++;
+    }
+  }
+  alert("Too many failed attempts. Reload page to try again.");
+  return false;
+}
+await promptForKey();
+// --- END KEY ACCESS CHECK ---
 
 loginAdminBtn.addEventListener('click', () => {
   const enteredPassword = adminPasswordInput.value.trim();
@@ -354,14 +391,10 @@ async function loadWorkingKeys() {
       const id = docSnap.id;
 
       const li = document.createElement('li');
-      li.style.display = "flex";
-      li.style.justifyContent = "space-between";
-      li.style.alignItems = "center";
 
       const keyText = document.createElement('span');
       keyText.textContent = `${key} (Expires: ${expireAt.toLocaleString()})`;
 
-      // DELETE BUTTON ADDED
       const delBtn = document.createElement('button');
       delBtn.textContent = "Delete";
       delBtn.className = "deleteKeyBtn";
@@ -378,6 +411,10 @@ async function loadWorkingKeys() {
           }
         }
       });
+
+      li.style.display = "flex";
+      li.style.justifyContent = "space-between";
+      li.style.alignItems = "center";
 
       li.appendChild(keyText);
       li.appendChild(delBtn);
@@ -404,54 +441,38 @@ generateBtn.addEventListener('click', () => {
 
   let query = "";
 
-  // Keywords (AND search)
   if (keywords) {
     const keysArray = keywords.split(/\s+/);
     query += keysArray.map(k => `"${k}"`).join(' ');
   }
-
-  // Exact phrase
   if (searchExact) {
     if (query) query += ' ';
     query += `"${searchExact.replace(/"/g, '')}"`;
   }
-
-  // Words in Title
   if (intitle) {
     if (query) query += ' ';
     const titles = intitle.split(/\s+/);
     query += titles.map(t => `intitle:${t}`).join(' ');
   }
-
-  // Words in URL
   if (inurl) {
     if (query) query += ' ';
     const urls = inurl.split(/\s+/);
     query += urls.map(u => `inurl:${u}`).join(' ');
   }
-
-  // Exclude Words
   if (excludeWords) {
     const excludeArr = excludeWords.split(/\s+/);
     query += ' ' + excludeArr.map(w => `-${w}`).join(' ');
   }
-
-  // Exclude Terms
   if (excludeTerms) {
     const excludeTermsArr = excludeTerms.split(/\s+/);
     query += ' ' + excludeTermsArr.map(w => `-${w}`).join(' ');
   }
-
-  // Site Search
   if (siteSearch) {
     query += ` site:${siteSearch}`;
   }
-
-  // File Type
   if (fileType) {
     query += ` filetype:${fileType}`;
   }
-
   result.value = query.trim();
 });
 </script>
