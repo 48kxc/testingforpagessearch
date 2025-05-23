@@ -201,8 +201,7 @@
 <div id="container">
   <h1>48 Searcher</h1>
 
-  <!-- Your advanced Google search UI -->
-
+  <!-- Advanced Google Search UI -->
   <label for="keywords">Keywords (space separated)</label>
   <input type="text" id="keywords" placeholder="e.g. openAI chatbot" />
 
@@ -216,7 +215,7 @@
   <input type="text" id="fileType" placeholder="e.g. pdf, docx, ppt" />
 
   <label for="searchExact">Exact Phrase</label>
-  <input type="text" id="searchExact" placeholder="e.g. \"machine learning\"" />
+  <input type="text" id="searchExact" placeholder="e.g. &quot;machine learning&quot;" />
 
   <label for="intitle">Words in Title</label>
   <input type="text" id="intitle" placeholder="e.g. security" />
@@ -236,21 +235,21 @@
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 
 <script>
-  // Your Firebase configuration - replace with your actual config
+  // Firebase config - fill with your own
   const firebaseConfig = {
-    apiKey: "AIzaSyDkU4W01OimygxLlEXBhqrba3PglcV2224",
-    authDomain: "searcher-key-sys.firebaseapp.com",
-    projectId: "searcher-key-sys",
-    storageBucket: "searcher-key-sys.firebasestorage.app",
-    messagingSenderId: "500491200168",
-    appId: "1:500491200168:web:91ae88fa17f8a8bb6f849d"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
 
   // Initialize Firebase
-  const app = firebase.initializeApp(firebaseConfig);
+  firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  // Elements for admin panel
+  // Elements
   const adminBtn = document.getElementById('adminBtn');
   const adminPanel = document.getElementById('adminPanel');
   const loginAdminBtn = document.getElementById('loginAdmin');
@@ -259,7 +258,10 @@
   const generateKeyBtn = document.getElementById('generateKey');
   const newKeyDisplay = document.getElementById('newKey');
 
-  // Show admin panel when button clicked
+  // Admin password constants
+  const MASTER_KEY = "48ontop2323";
+
+  // Show admin panel modal
   adminBtn.addEventListener('click', () => {
     adminPanel.style.display = 'block';
     adminPasswordInput.value = '';
@@ -267,12 +269,10 @@
     newKeyDisplay.textContent = '';
   });
 
-  // Admin login password (change this!)
-  const ADMIN_PASSWORD = "48ontop2323";
-
-  // Login button handler
+  // Admin login check
   loginAdminBtn.addEventListener('click', () => {
-    if(adminPasswordInput.value === ADMIN_PASSWORD){
+    const input = adminPasswordInput.value.trim();
+    if (input === MASTER_KEY) {
       keyGenerator.style.display = 'block';
       alert('Admin access granted!');
     } else {
@@ -280,15 +280,15 @@
     }
   });
 
-  // Generate unique key (simple random string)
+  // Generate a random unique key string
   function generateUniqueKey() {
-    return 'key-' + Math.random().toString(36).substr(2, 9);
+    return 'key-' + Math.random().toString(36).substring(2, 11);
   }
 
-  // Generate key button handler
+  // Store generated key in Firestore with 7-hour expiry
   generateKeyBtn.addEventListener('click', async () => {
     const key = generateUniqueKey();
-    const expireAt = new Date(Date.now() + 7 * 60 * 60 * 1000); // 7 hours later
+    const expireAt = new Date(Date.now() + 7 * 60 * 60 * 1000); // 7 hours from now
 
     try {
       await db.collection('accessKeys').doc(key).set({
@@ -296,9 +296,9 @@
         expireAt: firebase.firestore.Timestamp.fromDate(expireAt)
       });
       newKeyDisplay.textContent = `New Access Key: ${key} (Expires in 7 hours)`;
-    } catch (err) {
-      console.error('Error storing key:', err);
-      alert('Failed to generate key, see console.');
+    } catch (error) {
+      console.error('Error generating key:', error);
+      alert('Failed to generate key. See console.');
     }
   });
 
@@ -322,18 +322,22 @@
 
     let queryParts = [];
 
-    if(keywords) queryParts.push(keywords.split(/\s+/).map(w => `"${w}"`).join(' '));
-    if(searchExact) queryParts.push(`"${searchExact.replace(/"/g, '')}"`);
-    if(excludeWords) queryParts.push(excludeWords.split(/\s+/).map(w => `-${w}`).join(' '));
-    if(siteSearch) queryParts.push(`site:${siteSearch}`);
-    if(fileType) queryParts.push(`filetype:${fileType}`);
-    if(intitle) queryParts.push(`intitle:${intitle}`);
-    if(inurl) queryParts.push(`inurl:${inurl}`);
-    if(excludeTerms) queryParts.push(excludeTerms.split(/\s+/).map(w => `-${w}`).join(' '));
+    if (keywords) queryParts.push(keywords.split(/\s+/).map(w => `"${w}"`).join(' '));
+    if (searchExact) queryParts.push(`"${searchExact.replace(/"/g, '')}"`);
+    if (excludeWords) queryParts.push(excludeWords.split(/\s+/).map(w => `-${w}`).join(' '));
+    if (siteSearch) queryParts.push(`site:${siteSearch}`);
+    if (fileType) queryParts.push(`filetype:${fileType}`);
+    if (intitle) queryParts.push(`intitle:${intitle}`);
+    if (inurl) queryParts.push(`inurl:${inurl}`);
+    if (excludeTerms) queryParts.push(excludeTerms.split(/\s+/).map(w => `-${w}`).join(' '));
 
     const finalQuery = queryParts.join(' ');
     result.value = finalQuery;
   });
+
+  // -- Optional: You can add access control for site usage by keys here if needed --
+  // For example, prompt user to enter a key, then verify it against Firebase OR check for MASTER_KEY.
 </script>
+
 </body>
 </html>
