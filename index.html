@@ -8,150 +8,247 @@
   body, html {
     margin: 0; padding: 0; height: 100%;
     font-family: Arial, sans-serif;
+    background: #1e1e2f;
+    color: white;
   }
   #accessKeyOverlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.9);
-    color: white;
+    background: rgba(0,0,0,0.95);
+    color: #fff;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 9999;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
   #accessKeyOverlay input {
-    padding: 8px;
-    font-size: 16px;
+    padding: 12px;
+    font-size: 18px;
+    border-radius: 8px;
+    border: none;
+    width: 320px;
+    box-sizing: border-box;
+    outline: none;
   }
   #accessKeyOverlay button {
-    padding: 8px 12px;
-    margin-left: 8px;
-    font-size: 16px;
+    padding: 12px 18px;
+    margin-left: 12px;
+    font-size: 18px;
+    background: #0055ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
   }
   #accessKeyError {
-    color: red;
-    margin-top: 10px;
+    color: #ff5555;
+    margin-top: 14px;
+    font-weight: bold;
     display: none;
   }
   #container {
     display: none;
+    max-width: 720px;
+    margin: 2rem auto;
     padding: 20px;
+    background: #27293d;
+    border-radius: 16px;
+    box-shadow: 0 0 20px rgba(0,0,255,0.4);
   }
+  label {
+    display: block;
+    margin-top: 16px;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  input[type="text"], input[type="password"], textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: none;
+    outline: none;
+    background: #0b0b1a;
+    color: #eee;
+    box-shadow: inset 0 0 8px rgba(0,0,50,0.8);
+  }
+  button#generateBtn {
+    margin-top: 20px;
+    padding: 14px 28px;
+    font-size: 18px;
+    background: #0080ff;
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 0 15px #0066cc;
+    transition: background 0.3s ease;
+  }
+  button#generateBtn:hover {
+    background: #0055cc;
+  }
+  textarea#result {
+    margin-top: 20px;
+    font-family: 'Consolas', monospace;
+    font-size: 16px;
+    border-radius: 14px;
+    background: #0a0a17;
+    color: #7fffd4;
+    border: none;
+    resize: vertical;
+    box-shadow: inset 0 0 12px #00ffdd;
+  }
+
+  /* Admin button */
   #adminBtn {
     position: fixed;
-    top: 10px; right: 10px;
-    padding: 8px 12px;
-    background: #007bff;
-    color: white;
+    top: 12px; right: 12px;
+    background: #0080ff;
     border: none;
+    color: white;
+    padding: 12px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 16px;
     cursor: pointer;
-    display: none; /* hidden initially */
+    box-shadow: 0 0 12px #0099ff;
+    display: none; /* hidden until admin login */
     z-index: 10000;
   }
+
+  /* Admin Panel */
   #adminPanel {
     position: fixed;
-    top: 50px; right: 10px;
-    width: 400px;
-    max-height: 80vh;
+    top: 60px; right: 12px;
+    width: 380px;
+    max-height: 75vh;
     overflow-y: auto;
-    background: #f4f4f4;
-    border: 1px solid #ccc;
-    padding: 10px;
-    display: none; /* hidden initially */
+    background: #111133;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 0 20px #0044ff;
+    color: #aaddff;
+    font-size: 14px;
+    display: none;
     z-index: 10001;
   }
+  #adminPanel h3, #adminPanel h4 {
+    margin-top: 0;
+    color: #66aaff;
+  }
+  #adminPanel input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 12px;
+    border: none;
+    background: #222244;
+    color: #eee;
+    margin-bottom: 12px;
+  }
+  #adminPanel button {
+    padding: 10px 14px;
+    background: #0055cc;
+    border: none;
+    color: white;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 0 8px #0077ff;
+  }
   #keyGenerator, #keyList {
-    margin-top: 10px;
+    margin-top: 16px;
   }
   table {
     width: 100%;
     border-collapse: collapse;
+    background: #0a0a33;
+    border-radius: 12px;
+    overflow: hidden;
   }
   th, td {
-    border: 1px solid #aaa;
-    padding: 5px;
+    border-bottom: 1px solid #0044cc;
+    padding: 8px;
     text-align: left;
   }
-  label {
-    display: block;
-    margin-top: 10px;
+  th {
+    background: #0055cc;
+    color: #cceeff;
   }
-  input[type="text"], input[type="password"], textarea {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 6px;
+  tbody tr:hover {
+    background: #003399;
   }
-  button {
-    cursor: pointer;
+  #newKey {
+    font-family: monospace;
+    font-weight: 700;
+    color: #55eeaa;
+    user-select: all;
   }
 </style>
 </head>
 <body>
 
-<!-- Access Key Overlay -->
+<!-- Access Key Modal Overlay -->
 <div id="accessKeyOverlay">
   <h2>Please Enter Access Key</h2>
-  <div>
-    <input type="text" id="accessKeyInput" placeholder="Enter key here" />
+  <div style="display:flex; align-items:center;">
+    <input type="text" id="accessKeyInput" placeholder="Enter your access key here" autocomplete="off" />
     <button id="accessKeySubmit">Submit</button>
   </div>
   <div id="accessKeyError">Invalid or expired key. Please try again.</div>
 </div>
 
-<!-- Main Container -->
+<!-- Main container with old UI restored -->
 <div id="container">
-  <h1>48 Searcher - Advanced Google Search Query Generator</h1>
-  <label>
-    Keywords (space separated):
-    <input type="text" id="keywords" placeholder="e.g. cats dogs" />
-  </label>
-  <label>
-    Exclude words (space separated):
-    <input type="text" id="excludeWords" placeholder="e.g. fish bird" />
-  </label>
-  <label>
-    Exact phrase:
-    <input type="text" id="searchExact" placeholder="e.g. cute puppies" />
-  </label>
-  <label>
-    Site or domain (e.g. site:.com or site:example.com):
-    <input type="text" id="siteSearch" placeholder="e.g. .com or example.com" />
-  </label>
-  <label>
-    Filetype (e.g. pdf, docx):
-    <input type="text" id="fileType" placeholder="e.g. pdf" />
-  </label>
-  <label>
-    intitle:
-    <input type="text" id="intitle" placeholder="Search titles containing..." />
-  </label>
-  <label>
-    inurl:
-    <input type="text" id="inurl" placeholder="Search URLs containing..." />
-  </label>
-  <label>
-    Exclude terms (space separated):
-    <input type="text" id="excludeTerms" placeholder="e.g. blog news" />
-  </label>
+  <h1 style="text-align:center; font-weight:800; font-size:2.2rem; margin-bottom:1rem;">48 Searcher - Advanced Google Search</h1>
+
+  <label for="keywords">Keywords (space separated):</label>
+  <input type="text" id="keywords" placeholder="e.g. cats dogs" />
+
+  <label for="excludeWords">Exclude words (space separated):</label>
+  <input type="text" id="excludeWords" placeholder="e.g. fish bird" />
+
+  <label for="searchExact">Exact phrase:</label>
+  <input type="text" id="searchExact" placeholder='e.g. "cute puppies"' />
+
+  <label for="siteSearch">Site or domain (e.g. site:.com or site:example.com):</label>
+  <input type="text" id="siteSearch" placeholder="e.g. .com or example.com" />
+
+  <label for="fileType">Filetype (e.g. pdf, docx):</label>
+  <input type="text" id="fileType" placeholder="e.g. pdf" />
+
+  <label for="intitle">intitle:</label>
+  <input type="text" id="intitle" placeholder="Search titles containing..." />
+
+  <label for="inurl">inurl:</label>
+  <input type="text" id="inurl" placeholder="Search URLs containing..." />
+
+  <label for="excludeTerms">Exclude terms (space separated):</label>
+  <input type="text" id="excludeTerms" placeholder="e.g. blog news" />
+
   <button id="generateBtn">Generate Search Query</button>
-  <br/><br/>
-  <textarea id="result" rows="6" readonly style="width: 100%;"></textarea>
+
+  <textarea id="result" rows="6" readonly placeholder="Your advanced Google search query will appear here..."></textarea>
 </div>
 
-<!-- Admin Button -->
+<!-- Admin button -->
 <button id="adminBtn">Admin Panel</button>
 
 <!-- Admin Panel -->
 <div id="adminPanel">
   <h3>Admin Login</h3>
-  <input type="password" id="adminPassword" placeholder="Enter admin password" />
+  <input type="password" id="adminPassword" placeholder="Enter admin password" autocomplete="off" />
   <button id="loginAdmin">Login</button>
 
   <div id="keyGenerator" style="display:none;">
     <h4>Generate New Access Key (7 hours expiry)</h4>
     <button id="generateKey">Generate Key</button>
-    <p>New Key: <span id="newKey" style="font-family: monospace; font-weight: bold;"></span></p>
+    <p>New Key: <span id="newKey"></span></p>
   </div>
 
   <div id="keyList" style="display:none;">
@@ -180,7 +277,7 @@
     Timestamp
   } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-  // Your Firebase config here
+  // Your Firebase config here (replace placeholders)
   const firebaseConfig = {
     apiKey: "AIzaSyDkU4W01OimygxLlEXBhqrba3PglcV2224",
     authDomain: "searcher-key-sys.firebaseapp.com",
@@ -195,9 +292,9 @@
 
   const KEYS_COLLECTION = "accessKeys";
   const MASTER_KEY = "48ontop2323";
-  const ADMIN_PASSWORD = "48ontop2323"; // change this to your secure admin password
+  const ADMIN_PASSWORD = "48ontop2323"; // CHANGE THIS to your secure admin password
 
-  // Utility: generate random key
+  // Utility: generate random key string
   function generateRandomKey(length = 12) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let key = '';
@@ -254,137 +351,136 @@
   async function validateAccessKey(key) {
     if (key === MASTER_KEY) return true;
     await removeExpiredKeys();
-    const activeKeys = await fetchActiveKeys();
-    return activeKeys.some(k => k.key === key);
+    const now = Timestamp.now();
+    const q = query(collection(db, KEYS_COLLECTION), where("key", "==", key), where("expires", ">", now));
+    const querySnapshot = await getDocs(q);
+    return !querySnapshot.empty;
   }
 
-  async function loadAndDisplayKeys() {
-    const activeKeys = await fetchActiveKeys();
-    keyListBody.innerHTML = "";
-    activeKeys.forEach(({ key, created, expires }) => {
-      const createdDate = created ? created.toDate().toLocaleString() : 'N/A';
-      const expiresDate = expires.toDate().toLocaleString();
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${key}</td><td>${createdDate}</td><td>${expiresDate}</td>`;
-      keyListBody.appendChild(tr);
-    });
+  // Handle access key submission
+  async function onAccessKeySubmit() {
+    const key = accessKeyInput.value.trim();
+    if (!key) {
+      accessKeyError.textContent = "Please enter a key.";
+      accessKeyError.style.display = "block";
+      return;
+    }
+    const valid = await validateAccessKey(key);
+    if (valid) {
+      accessKeyOverlay.style.display = "none";
+      container.style.display = "block";
+    } else {
+      accessKeyError.textContent = "Invalid or expired key. Please try again.";
+      accessKeyError.style.display = "block";
+    }
   }
+
+  accessKeySubmit.addEventListener("click", onAccessKeySubmit);
+  accessKeyInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      onAccessKeySubmit();
+    }
+  });
 
   // Admin login
-  loginAdminBtn.onclick = async () => {
-    if (adminPasswordInput.value === ADMIN_PASSWORD) {
+  loginAdminBtn.addEventListener("click", () => {
+    const pass = adminPasswordInput.value;
+    if (pass === ADMIN_PASSWORD) {
       isAdminLoggedIn = true;
-      adminPasswordInput.value = '';
-      adminPasswordInput.style.display = 'none';
-      loginAdminBtn.style.display = 'none';
-      keyGeneratorDiv.style.display = 'block';
-      keyListDiv.style.display = 'block';
-      adminBtn.style.display = 'inline-block';
-      await loadAndDisplayKeys();
+      alert("Admin login successful.");
+      adminPasswordInput.value = "";
+      adminBtn.style.display = "block";
+      keyGeneratorDiv.style.display = "block";
+      keyListDiv.style.display = "block";
+      adminPanel.querySelector("h3").textContent = "Admin Panel";
+      loginAdminBtn.style.display = "none";
+      adminPasswordInput.style.display = "none";
+      loadKeys();
     } else {
-      alert('Incorrect admin password');
+      alert("Incorrect admin password.");
     }
-  };
+  });
 
-  // Toggle admin panel visibility
-  adminBtn.onclick = () => {
-    adminPanel.style.display = adminPanel.style.display === 'none' || adminPanel.style.display === '' ? 'block' : 'none';
-  };
+  // Toggle admin panel
+  adminBtn.addEventListener("click", () => {
+    if (adminPanel.style.display === "block") {
+      adminPanel.style.display = "none";
+    } else {
+      adminPanel.style.display = "block";
+      loadKeys();
+    }
+  });
 
   // Generate new key
-  generateKeyBtn.onclick = async () => {
+  generateKeyBtn.addEventListener("click", async () => {
     const newKey = generateRandomKey(14);
     await addKeyToFirestore(newKey);
     newKeyDisplay.textContent = newKey;
-    await loadAndDisplayKeys();
-  };
-
-  // Access key submission
-  accessKeySubmit.onclick = async () => {
-    const key = accessKeyInput.value.trim();
-    if (!key) return;
-    accessKeyError.style.display = 'none';
-    const valid = await validateAccessKey(key);
-    if (valid) {
-      accessKeyOverlay.style.display = 'none';
-      container.style.display = 'block';
-    } else {
-      accessKeyError.style.display = 'block';
-    }
-  };
-
-  accessKeyInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') accessKeySubmit.click();
+    await loadKeys();
   });
 
-  // 48 Searcher main logic
-  const keywordsInput = document.getElementById('keywords');
-  const excludeWordsInput = document.getElementById('excludeWords');
-  const siteSearchInput = document.getElementById('siteSearch');
-  const fileTypeInput = document.getElementById('fileType');
-  const searchExactInput = document.getElementById('searchExact');
-  const intitleInput = document.getElementById('intitle');
-  const inurlInput = document.getElementById('inurl');
-  const excludeTermsInput = document.getElementById('excludeTerms');
+  // Load keys into admin table
+  async function loadKeys() {
+    keyListBody.innerHTML = "";
+    const keys = await fetchActiveKeys();
+    keys.sort((a,b) => a.created.seconds - b.created.seconds);
+    keys.forEach(k => {
+      const createdDate = k.created ? k.created.toDate().toLocaleString() : "Loading...";
+      const expiresDate = k.expires ? k.expires.toDate().toLocaleString() : "N/A";
+      const row = document.createElement("tr");
+      row.innerHTML = `<td style="font-family: monospace;">${k.key}</td><td>${createdDate}</td><td>${expiresDate}</td>`;
+      keyListBody.appendChild(row);
+    });
+  }
+
+  // 48 Searcher core logic (old UI logic retained)
   const generateBtn = document.getElementById('generateBtn');
   const resultTextarea = document.getElementById('result');
 
-  generateBtn.onclick = () => {
+  generateBtn.addEventListener('click', () => {
+    const keywords = document.getElementById('keywords').value.trim();
+    const excludeWords = document.getElementById('excludeWords').value.trim();
+    const searchExact = document.getElementById('searchExact').value.trim();
+    const siteSearch = document.getElementById('siteSearch').value.trim();
+    const fileType = document.getElementById('fileType').value.trim();
+    const intitle = document.getElementById('intitle').value.trim();
+    const inurl = document.getElementById('inurl').value.trim();
+    const excludeTerms = document.getElementById('excludeTerms').value.trim();
+
     let queryParts = [];
 
-    // Keywords
-    let keywords = keywordsInput.value.trim().split(/\s+/).filter(Boolean);
-    let excludeWords = excludeWordsInput.value.trim().split(/\s+/).filter(Boolean);
-    keywords = keywords.filter(w => !excludeWords.includes(w));
-    if (keywords.length) {
-      queryParts.push(keywords.map(w => `"${w}"`).join(' '));
+    if(keywords) {
+      queryParts.push(keywords.split(/\s+/).map(k => `+${k}`).join(" "));
     }
-
-    // Exact phrase
-    const exact = searchExactInput.value.trim();
-    if (exact) {
-      queryParts.push(`"${exact}"`);
+    if(excludeWords) {
+      queryParts.push(excludeWords.split(/\s+/).map(w => `-${w}`).join(" "));
     }
-
-    // site:
-    const site = siteSearchInput.value.trim();
-    if (site) {
-      if (site.startsWith('.')) {
-        queryParts.push(`site:${site}`);
-      } else if (site.includes('.')) {
-        queryParts.push(`site:${site}`);
+    if(searchExact) {
+      queryParts.push(`"${searchExact}"`);
+    }
+    if(siteSearch) {
+      if(siteSearch.startsWith("site:")) {
+        queryParts.push(siteSearch);
+      } else {
+        queryParts.push(`site:${siteSearch}`);
       }
     }
-
-    // filetype:
-    const filetype = fileTypeInput.value.trim();
-    if (filetype) {
-      queryParts.push(`filetype:${filetype}`);
+    if(fileType) {
+      queryParts.push(`filetype:${fileType}`);
     }
-
-    // intitle:
-    const intitle = intitleInput.value.trim();
-    if (intitle) {
+    if(intitle) {
       queryParts.push(`intitle:${intitle}`);
     }
-
-    // inurl:
-    const inurl = inurlInput.value.trim();
-    if (inurl) {
+    if(inurl) {
       queryParts.push(`inurl:${inurl}`);
     }
+    if(excludeTerms) {
+      queryParts.push(excludeTerms.split(/\s+/).map(t => `-${t}`).join(" "));
+    }
 
-    // Exclude terms
-    let excludeTerms = excludeTermsInput.value.trim().split(/\s+/).filter(Boolean);
-    excludeTerms.forEach(term => {
-      queryParts.push(`-${term}`);
-    });
-
-    // Compose final query
-    const finalQuery = queryParts.join(' ');
-    resultTextarea.value = finalQuery;
-  };
+    const finalQuery = queryParts.join(" ").trim();
+    resultTextarea.value = finalQuery || "Please enter some search criteria.";
+  });
 </script>
-
 </body>
 </html>
