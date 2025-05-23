@@ -39,6 +39,7 @@ box-shadow:
 inset 0 0 20px 1px #6c4dc9;
 position: relative;
 z-index: 2;
+display: none; /* hidden until login */
 }
 h1 {
 text-align: center;
@@ -122,6 +123,7 @@ inset 0 -2px 5px #6c4dc9;
 transition: background 0.3s ease;
 z-index: 10;
 width: auto;
+display: none; /* hidden until login */
 }
 #adminBtn:hover {
 background: #633ec9;
@@ -133,14 +135,15 @@ transform: translate(-50%, -50%);
 background: #2b1a58;
 border-radius: 20px;
 padding: 30px 40px;
-width: 320px;
+width: 400px;
 box-shadow:
 0 0 30px 5px #6c4dc9,
 inset 0 0 15px #451f9a;
 display: none;
 z-index: 100;
+color: #ddd;
 }
-#adminPanel input[type=password] {
+#adminPanel input[type=password], #adminPanel input[type=text] {
 width: 100%;
 padding: 12px 15px;
 font-size: 1.1em;
@@ -189,27 +192,94 @@ padding-left: 0;
 #workingKeys li {
 margin-bottom: 6px;
 word-break: break-all;
+display: flex;
+justify-content: space-between;
+}
+#workingKeys .expireTime {
+font-style: italic;
+font-size: 0.85em;
+color: #a99fff;
+margin-left: 8px;
+white-space: nowrap;
+}
+#errorMessage, #keyErrorMessage {
+color: #ff6f6f;
+font-weight: 700;
+margin-bottom: 10px;
+text-align: center;
+}
+#loginOverlay {
+position: fixed;
+top: 0; left: 0; right: 0; bottom: 0;
+background: rgba(0,0,0,0.85);
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 9999;
+flex-direction: column;
+padding: 20px;
+color: #ddd;
+font-family: 'Roboto Mono', monospace;
+}
+#loginOverlay input {
+font-size: 1.3em;
+padding: 12px 15px;
+border-radius: 14px;
+border: 2px solid #5a3e9c;
+background: #3f2e6a;
+color: #ddd;
+box-shadow: inset 0 0 6px #6a54ac;
+margin-bottom: 15px;
+width: 320px;
+max-width: 90vw;
+}
+#loginOverlay button {
+font-size: 1.2em;
+padding: 12px 15px;
+border-radius: 14px;
+border: none;
+background: linear-gradient(145deg, #8362ff, #4a31bf);
+color: #eee;
+font-weight: 700;
+cursor: pointer;
+width: 320px;
+max-width: 90vw;
+box-shadow:
+0 5px 15px #4a31bf,
+inset 0 -3px 8px #8362ff;
+transition: background 0.4s ease;
+}
+#loginOverlay button:hover {
+background: linear-gradient(145deg, #9f7dff, #6328e1);
 }
 </style>
 </head>
 <body>
 
+<div id="loginOverlay">
+<h2>Please enter your Access Key or Admin Password</h2>
+<input type="text" id="accessKeyInput" placeholder="Access Key or Admin Password" autocomplete="off" autocapitalize="none" />
+<div id="keyErrorMessage"></div>
+<button id="submitAccessKeyBtn">Submit</button>
+</div>
+
 <button id="adminBtn">Admin Panel</button>
 
-<div id="adminPanel">
-<input type="password" id="adminPassword" placeholder="Enter admin password" />
+<div id="adminPanel" aria-modal="true" role="dialog" aria-labelledby="adminPanelTitle" aria-hidden="true">
+<h2 id="adminPanelTitle">Admin Panel Login</h2>
+<input type="password" id="adminPassword" placeholder="Enter admin password" autocomplete="off" autocapitalize="none" />
 <button id="loginAdmin">Login</button>
 <div id="keyGenerator" style="display:none;">
 <button id="generateKey">Generate Access Key</button>
 <p id="newKey"></p>
 <div id="workingKeys" style="display:none;">
-<strong>Working Keys:</strong>
+<strong>Working Keys (Expires at):</strong>
 <ul id="keysList"></ul>
 </div>
 </div>
 </div>
 
-<div id="container">
+<div id="container" aria-live="polite" aria-label="Main Searcher Interface">
 <h1>48 Searcher</h1>
 
 <label for="keywords">Keywords (space separated)</label>
@@ -270,96 +340,248 @@ const newKeyDisplay = document.getElementById('newKey');
 const workingKeysDiv = document.getElementById('workingKeys');
 const keysList = document.getElementById('keysList');
 
-adminBtn.addEventListener('click', () => {
-adminPanel.style.display = 'block';
-adminPasswordInput.value = '';
-keyGeneratorDiv.style.display = 'none';
-newKeyDisplay.textContent = '';
-workingKeysDiv.style.display = 'none';
-});
+const container = document.getElementById('container');
+const loginOverlay = document.getElementById('loginOverlay');
+const accessKeyInput = document.getElementById('accessKeyInput');
+const submitAccessKeyBtn = document.getElementById('submitAccessKeyBtn');
+const keyErrorMessage = document.getElementById('keyErrorMessage');
 
-loginAdminBtn.addEventListener('click', async () => {
-const entered = adminPasswordInput.value.trim();
-if (entered === MASTER_KEY) {
-keyGeneratorDiv.style.display = 'block';
-workingKeysDiv.style.display = 'block';
-await loadWorkingKeys();
-alert('Admin login successful.');
-} else {
-alert('Wrong admin password!');
-keyGeneratorDiv.style.display = 'none';
-workingKeysDiv.style.display = 'none';
-}
-});
+let loggedIn = false;
+let isAdmin = false;
 
-function generateRandomKey() {
-const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-let key = '';
-for(let i=0; i<16; i++) {
-key += chars.charAt(Math.floor(Math.random() * chars.length));
-}
-return key;
+function formatTimestamp(ts) {
+  // ts is a Firestore Timestamp
+  const date = ts.toDate();
+  return date.toLocaleString(undefined, { 
+    year: 'numeric', month: 'short', day: 'numeric',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false 
+  });
 }
 
-generateKeyBtn.addEventListener('click', async () => {
-const newKey = generateRandomKey();
-const expireAt = Timestamp.fromDate(new Date(Date.now() + 7 * 3600 * 1000)); // 7 hours
-try {
-await addDoc(keysCollection, { key: newKey, expireAt });
-newKeyDisplay.textContent = `Generated key: ${newKey} (valid for 7 hours)`;
-await loadWorkingKeys();
-} catch (e) {
-alert('Error saving key: ' + e.message);
+async function checkKeyValid(inputKey) {
+  if(inputKey === MASTER_KEY) return true; // master key always valid
+
+  const now = Timestamp.now();
+  const q = query(keysCollection, 
+    where("key", "==", inputKey),
+    where("expireAt", ">", now)
+  );
+  const snapshot = await getDocs(q);
+  return !snapshot.empty;
 }
-});
+
+async function validateAccessKeyOrPassword(inputKey) {
+  const valid = await checkKeyValid(inputKey);
+  return valid;
+}
 
 async function loadWorkingKeys() {
-keysList.innerHTML = '';
-const now = Timestamp.now();
-const q = query(keysCollection, where("expireAt", ">", now));
-const snapshot = await getDocs(q);
+  keysList.innerHTML = '';
+  const now = Timestamp.now();
+  const q = query(keysCollection, where("expireAt", ">", now));
+  const snapshot = await getDocs(q);
 
-if (snapshot.empty) {
-keysList.innerHTML = '<li>No valid keys found.</li>';
-} else {
-snapshot.forEach(doc => {
-const data = doc.data();
-keysList.innerHTML += `<li>${data.key}</li>`;
+  if (snapshot.empty) {
+    keysList.innerHTML = '<li>No valid keys found.</li>';
+  } else {
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const expFormatted = formatTimestamp(data.expireAt);
+      keysList.innerHTML += `<li><span>${data.key}</span><span class="expireTime">Expires at: ${expFormatted}</span></li>`;
+    });
+  }
+}
+
+// Handle login overlay submission for main site access
+submitAccessKeyBtn.addEventListener('click', async () => {
+  const input = accessKeyInput.value.trim();
+  if(!input) {
+    keyErrorMessage.textContent = "Please enter an access key or admin password.";
+    return;
+  }
+  keyErrorMessage.textContent = "";
+  try {
+    const valid = await validateAccessKeyOrPassword(input);
+    if(valid) {
+      loggedIn = true;
+      // If input is master key, mark admin true too
+      isAdmin = (input === MASTER_KEY);
+      sessionStorage.setItem('accessKey', input);
+      initializeAfterLogin();
+    } else {
+      keyErrorMessage.textContent = "Invalid or expired key/password.";
+    }
+  } catch(e) {
+    keyErrorMessage.textContent = "Error validating key. Please try again.";
+    console.error(e);
+  }
 });
-}
+
+// Initialize page after successful login
+async function initializeAfterLogin() {
+  loginOverlay.style.display = 'none';
+  container.style.display = 'block';
+  adminBtn.style.display = 'block';
+
+  if(isAdmin) {
+    // Admin panel remains locked until clicked
+    // Admin login via separate password still required
+    // But user can access admin panel UI here
+  }
+
+  // Optional: you can also auto login to admin panel if master key
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+// Admin panel open
+adminBtn.addEventListener('click', () => {
+  adminPanel.style.display = 'block';
+  adminPasswordInput.value = '';
+  keyGeneratorDiv.style.display = 'none';
+  newKeyDisplay.textContent = '';
+  workingKeysDiv.style.display = 'none';
+  adminPanel.setAttribute('aria-hidden', 'false');
+  adminPasswordInput.focus();
+});
+
+// Admin panel login submit
+loginAdminBtn.addEventListener('click', async () => {
+  const pw = adminPasswordInput.value.trim();
+  if(pw === MASTER_KEY) {
+    isAdmin = true;
+    keyGeneratorDiv.style.display = 'block';
+    workingKeysDiv.style.display = 'block';
+    await loadWorkingKeys();
+    adminPasswordInput.value = '';
+    loginAdminBtn.style.display = 'none';
+  } else {
+    alert('Invalid admin password.');
+  }
+});
+
+// Generate new key with 7 hours expiry
+generateKeyBtn.addEventListener('click', async () => {
+  generateKeyBtn.disabled = true;
+  newKeyDisplay.textContent = 'Generating...';
+
+  // Generate a random 12-character key (uppercase letters and digits)
+  function randomKey(length = 12) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for(let i=0; i<length; i++) {
+      result += chars.charAt(Math.floor(Math.random()*chars.length));
+    }
+    return result;
+  }
+
+  const newKey = randomKey();
+  const expireAt = Timestamp.fromDate(new Date(Date.now() + 7*3600*1000)); // 7 hours from now
+
+  try {
+    await addDoc(keysCollection, {
+      key: newKey,
+      expireAt: expireAt,
+      createdAt: serverTimestamp()
+    });
+    newKeyDisplay.textContent = newKey + " (Expires in 7 hours)";
+    await loadWorkingKeys();
+  } catch(e) {
+    newKeyDisplay.textContent = 'Error generating key.';
+    console.error(e);
+  }
+  generateKeyBtn.disabled = false;
+});
+
+// Hide admin panel when clicking outside or pressing Escape
+window.addEventListener('click', (e) => {
+  if(e.target === adminPanel) {
+    adminPanel.style.display = 'none';
+    adminPanel.setAttribute('aria-hidden', 'true');
+    loginAdminBtn.style.display = 'inline-block';
+    keyGeneratorDiv.style.display = 'none';
+    newKeyDisplay.textContent = '';
+    workingKeysDiv.style.display = 'none';
+  }
+});
+window.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && adminPanel.style.display === 'block') {
+    adminPanel.style.display = 'none';
+    adminPanel.setAttribute('aria-hidden', 'true');
+    loginAdminBtn.style.display = 'inline-block';
+    keyGeneratorDiv.style.display = 'none';
+    newKeyDisplay.textContent = '';
+    workingKeysDiv.style.display = 'none';
+  }
+});
+
+// On page load, check if sessionStorage has valid key to skip login overlay
+(async () => {
+  const savedKey = sessionStorage.getItem('accessKey');
+  if(savedKey) {
+    try {
+      const valid = await validateAccessKeyOrPassword(savedKey);
+      if(valid) {
+        loggedIn = true;
+        isAdmin = (savedKey === MASTER_KEY);
+        initializeAfterLogin();
+      }
+    } catch(e) {
+      console.warn("Failed to validate saved key:", e);
+    }
+  }
+})();
+
+// Search query generation logic (unchanged)
 const generateBtn = document.getElementById('generateBtn');
-const result = document.getElementById('result');
-const keywords = document.getElementById('keywords');
-const excludeWords = document.getElementById('excludeWords');
-const siteSearch = document.getElementById('siteSearch');
-const fileType = document.getElementById('fileType');
-const searchExact = document.getElementById('searchExact');
-const intitle = document.getElementById('intitle');
-const inurl = document.getElementById('inurl');
-const excludeTerms = document.getElementById('excludeTerms');
+const resultTextarea = document.getElementById('result');
 
 generateBtn.addEventListener('click', () => {
-let queryParts = [];
-if (keywords.value.trim()) queryParts.push(keywords.value.trim());
-if (searchExact.value.trim()) queryParts.push(`"${searchExact.value.trim()}"`);
-if (siteSearch.value.trim()) queryParts.push(`site:${siteSearch.value.trim()}`);
-if (fileType.value.trim()) queryParts.push(`filetype:${fileType.value.trim()}`);
-if (intitle.value.trim()) queryParts.push(`intitle:${intitle.value.trim()}`);
-if (inurl.value.trim()) queryParts.push(`inurl:${inurl.value.trim()}`);
-if (excludeWords.value.trim()) {
-const excludeArr = excludeWords.value.trim().split(/\s+/);
-excludeArr.forEach(word => queryParts.push(`-${word}`));
-}
-if (excludeTerms.value.trim()) {
-const excludeArr2 = excludeTerms.value.trim().split(/\s+/);
-excludeArr2.forEach(word => queryParts.push(`-${word}`));
-}
-const finalQuery = queryParts.join(' ');
-result.value = finalQuery;
-});
+  let keywords = document.getElementById('keywords').value.trim();
+  let excludeWords = document.getElementById('excludeWords').value.trim();
+  let siteSearch = document.getElementById('siteSearch').value.trim();
+  let fileType = document.getElementById('fileType').value.trim();
+  let searchExact = document.getElementById('searchExact').value.trim();
+  let intitle = document.getElementById('intitle').value.trim();
+  let inurl = document.getElementById('inurl').value.trim();
+  let excludeTerms = document.getElementById('excludeTerms').value.trim();
+
+  let queryParts = [];
+
+  if(keywords) {
+    let words = keywords.split(/\s+/);
+    queryParts.push(words.map(w => `"${w}"`).join(' OR '));
+  }
+  if(searchExact) {
+    queryParts.push(searchExact);
+  }
+  if(excludeWords) {
+    let words = excludeWords.split(/\s+/);
+    queryParts.push(words.map(w => `-${w}`).join(' '));
+  }
+  if(siteSearch) {
+    if(siteSearch.startsWith('.')) {
+      queryParts.push(`site:${siteSearch}`);
+    } else if(siteSearch.includes('.')) {
+      queryParts.push(`site:${siteSearch}`);
+    }
+  }
+  if(fileType) {
+    queryParts.push(`filetype:${fileType}`);
+  }
+  if(intitle) {
+    let words = intitle.split(/\s+/);
+    queryParts.push(words.map(w => `intitle:${w}`).join(' '));
+  }
+  if(inurl) {
+    let words = inurl.split(/\s+/);
+    queryParts.push(words.map(w => `inurl:${w}`).join(' '));
+  }
+  if(excludeTerms) {
+    let words = excludeTerms.split(/\s+/);
+    queryParts.push(words.map(w => `-${w}`).join(' '));
+  }
+
+  resultTextarea.value = queryParts.join(' ');
 });
 </script>
 
