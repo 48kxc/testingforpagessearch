@@ -1,314 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>48 Searcher</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
-body, html {
-margin: 0; padding: 0; height: 100%;
-background: #1a0b3a;
-color: #ddd;
-font-family: 'Roboto Mono', monospace;
-overflow-x: hidden;
-position: relative;
-}
-body::before {
-content: "";
-position: fixed;
-top: 0; left: 0; right: 0; bottom: 0;
-background: radial-gradient(circle, #fff 1px, transparent 1px) repeat;
-background-size: 20px 20px;
-opacity: 0.12;
-animation: starsMove 60s linear infinite;
-z-index: 0;
-}
-@keyframes starsMove {
-from { background-position: 0 0; }
-to { background-position: 1000px 1000px; }
-}
-#container {
-max-width: 700px;
-background: #2b1a58;
-margin: 50px auto 80px;
-padding: 30px 40px;
-border-radius: 20px;
-box-shadow:
-0 0 20px 3px #451f9a,
-inset 0 0 20px 1px #6c4dc9;
-position: relative;
-z-index: 2;
-display: none; /* hidden until login */
-}
-h1 {
-text-align: center;
-font-weight: 600;
-font-size: 3em;
-color: #a27eff;
-margin-bottom: 30px;
-text-shadow: 0 0 5px #bf9fff;
-}
-label {
-display: block;
-margin-top: 18px;
-margin-bottom: 6px;
-font-weight: 600;
-color: #d2c9f7;
-}
-input[type=text], select {
-width: 100%;
-padding: 10px 15px;
-border-radius: 12px;
-border: 2px solid #5a3e9c;
-background: #3f2e6a;
-color: #ddd;
-font-size: 1.1em;
-box-shadow: inset 0 0 6px #6a54ac;
-transition: border-color 0.3s ease;
-}
-input[type=text]:focus, select:focus {
-outline: none;
-border-color: #b79bff;
-box-shadow: 0 0 10px #b79bff;
-background: #4b3a80;
-}
-button {
-margin-top: 25px;
-width: 100%;
-background: linear-gradient(145deg, #8362ff, #4a31bf);
-color: #eee;
-font-weight: 700;
-font-size: 1.2em;
-padding: 12px;
-border: none;
-border-radius: 14px;
-cursor: pointer;
-box-shadow:
-0 5px 15px #4a31bf,
-inset 0 -3px 8px #8362ff;
-transition: background 0.4s ease;
-}
-button:hover {
-background: linear-gradient(145deg, #9f7dff, #6328e1);
-}
-textarea {
-margin-top: 25px;
-width: 100%;
-height: 150px;
-background: #3f2e6a;
-border-radius: 12px;
-border: 2px solid #5a3e9c;
-color: #ccc;
-padding: 15px;
-font-family: 'Roboto Mono', monospace;
-font-size: 1.1em;
-box-shadow: inset 0 0 8px #6a54ac;
-resize: none;
-}
-#adminBtn {
-position: fixed;
-top: 20px;
-right: 20px;
-background: #4b3a80;
-color: #ddd;
-border: none;
-padding: 12px 18px;
-border-radius: 16px;
-font-weight: 700;
-cursor: pointer;
-box-shadow:
-0 4px 10px #2f235d,
-inset 0 -2px 5px #6c4dc9;
-transition: background 0.3s ease;
-z-index: 10;
-width: auto;
-display: none; /* hidden until login */
-}
-#adminBtn:hover {
-background: #633ec9;
-}
-#adminPanel {
-position: fixed;
-top: 50%; left: 50%;
-transform: translate(-50%, -50%);
-background: #2b1a58;
-border-radius: 20px;
-padding: 30px 40px;
-width: 400px;
-box-shadow:
-0 0 30px 5px #6c4dc9,
-inset 0 0 15px #451f9a;
-display: none;
-z-index: 100;
-color: #ddd;
-}
-#adminPanel input[type=password], #adminPanel input[type=text] {
-width: 100%;
-padding: 12px 15px;
-font-size: 1.1em;
-border-radius: 14px;
-border: 2px solid #5a3e9c;
-background: #3f2e6a;
-color: #ddd;
-box-shadow: inset 0 0 6px #6a54ac;
-margin-bottom: 15px;
-}
-#adminPanel button {
-width: 100%;
-background: #633ec9;
-padding: 12px;
-border-radius: 14px;
-font-weight: 700;
-box-shadow: 0 5px 15px #4a31bf;
-}
-#keyGenerator {
-margin-top: 20px;
-}
-#newKey {
-margin-top: 12px;
-font-family: 'Roboto Mono', monospace;
-font-weight: 700;
-font-size: 1.1em;
-color: #b79bff;
-word-break: break-word;
-}
-#workingKeys {
-margin-top: 25px;
-padding: 15px;
-background: #3f2e6a;
-border-radius: 12px;
-border: 2px solid #5a3e9c;
-color: #ccc;
-font-size: 0.95em;
-max-height: 200px;
-overflow-y: auto;
-box-shadow: inset 0 0 8px #6a54ac;
-}
-#workingKeys ul {
-list-style: none;
-padding-left: 0;
-}
-#workingKeys li {
-margin-bottom: 6px;
-word-break: break-all;
-display: flex;
-justify-content: space-between;
-}
-#workingKeys .expireTime {
-font-style: italic;
-font-size: 0.85em;
-color: #a99fff;
-margin-left: 8px;
-white-space: nowrap;
-}
-#errorMessage, #keyErrorMessage {
-color: #ff6f6f;
-font-weight: 700;
-margin-bottom: 10px;
-text-align: center;
-}
-#loginOverlay {
-position: fixed;
-top: 0; left: 0; right: 0; bottom: 0;
-background: rgba(0,0,0,0.85);
-display: flex;
-justify-content: center;
-align-items: center;
-z-index: 9999;
-flex-direction: column;
-padding: 20px;
-color: #ddd;
-font-family: 'Roboto Mono', monospace;
-}
-#loginOverlay input {
-font-size: 1.3em;
-padding: 12px 15px;
-border-radius: 14px;
-border: 2px solid #5a3e9c;
-background: #3f2e6a;
-color: #ddd;
-box-shadow: inset 0 0 6px #6a54ac;
-margin-bottom: 15px;
-width: 320px;
-max-width: 90vw;
-}
-#loginOverlay button {
-font-size: 1.2em;
-padding: 12px 15px;
-border-radius: 14px;
-border: none;
-background: linear-gradient(145deg, #8362ff, #4a31bf);
-color: #eee;
-font-weight: 700;
-cursor: pointer;
-width: 320px;
-max-width: 90vw;
-box-shadow:
-0 5px 15px #4a31bf,
-inset 0 -3px 8px #8362ff;
-transition: background 0.4s ease;
-}
-#loginOverlay button:hover {
-background: linear-gradient(145deg, #9f7dff, #6328e1);
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>48 Searcher</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    #container {
+      display: none;
+      padding: 20px;
+    }
+    #loginOverlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: #000000cc;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+    }
+    #adminPanel {
+      display: none;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    #keyGenerator, #workingKeys {
+      margin-top: 20px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      margin: 5px 0;
+      background: #2a2a2a;
+      padding: 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .expireTime {
+      color: #bbb;
+      font-size: 0.9em;
+    }
+    #adminBtn {
+      display: none;
+      position: fixed;
+      top: 10px;
+      right: 10px;
+    }
+  </style>
 </head>
 <body>
 
 <div id="loginOverlay">
-<h2>Please enter your Access Key or Admin Password</h2>
-<input type="text" id="accessKeyInput" placeholder="Access Key or Admin Password" autocomplete="off" autocapitalize="none" />
-<div id="keyErrorMessage"></div>
-<button id="submitAccessKeyBtn">Submit</button>
+  <h2>Enter Access Key or Admin Password</h2>
+  <input id="accessKeyInput" type="text" placeholder="Access Key / Admin Password">
+  <button id="submitAccessKeyBtn">Submit</button>
+  <p id="keyErrorMessage" style="color:red;"></p>
 </div>
 
-<button id="adminBtn">Admin Panel</button>
-
-<div id="adminPanel" aria-modal="true" role="dialog" aria-labelledby="adminPanelTitle" aria-hidden="true">
-<h2 id="adminPanelTitle">Admin Panel Login</h2>
-<input type="password" id="adminPassword" placeholder="Enter admin password" autocomplete="off" autocapitalize="none" />
-<button id="loginAdmin">Login</button>
-<div id="keyGenerator" style="display:none;">
-<button id="generateKey">Generate Access Key</button>
-<p id="newKey"></p>
-<div id="workingKeys" style="display:none;">
-<strong>Working Keys (Expires at):</strong>
-<ul id="keysList"></ul>
-</div>
-</div>
+<div id="container">
+  <button id="adminBtn">Admin Panel</button>
+  <h1>48 Searcher</h1>
+  <!-- Your app content goes here -->
 </div>
 
-<div id="container" aria-live="polite" aria-label="Main Searcher Interface">
-<h1>48 Searcher</h1>
-
-<label for="keywords">Keywords (space separated)</label>
-<input type="text" id="keywords" placeholder="e.g. openAI chatbot" />
-
-<label for="excludeWords">Exclude Words (space separated)</label>
-<input type="text" id="excludeWords" placeholder="e.g. tutorial example" />
-
-<label for="siteSearch">Site Search (optional domain or leave blank)</label>
-<input type="text" id="siteSearch" placeholder="e.g. .com, .pages.dev, or example.com" />
-
-<label for="fileType">File Type (optional)</label>
-<input type="text" id="fileType" placeholder="e.g. pdf, docx, ppt" />
-
-<label for="searchExact">Exact Phrase</label>
-<input type="text" id="searchExact" placeholder='e.g. "machine learning"' />
-
-<label for="intitle">Words in Title</label>
-<input type="text" id="intitle" placeholder="e.g. security" />
-
-<label for="inurl">Words in URL</label>
-<input type="text" id="inurl" placeholder="e.g. login" />
-
-<label for="excludeTerms">Exclude Terms</label>
-<input type="text" id="excludeTerms" placeholder="e.g. ads, sponsored" />
-
-<button id="generateBtn">Generate Search Query</button>
-
-<textarea id="result" readonly placeholder="Your advanced search query will appear here..."></textarea>
+<div id="adminPanel">
+  <input id="adminPassword" type="password" placeholder="Enter Admin Password">
+  <button id="loginAdmin">Login as Admin</button>
+  <div id="keyGenerator">
+    <button id="generateKey">Generate Key</button>
+    <p id="newKey"></p>
+  </div>
+  <div id="workingKeys">
+    <h3>Valid Access Keys</h3>
+    <ul id="keysList"></ul>
+  </div>
 </div>
 
 <script type="module">
@@ -316,12 +98,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebas
 import { getFirestore, collection, addDoc, serverTimestamp, Timestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
 const firebaseConfig = {
-apiKey: "AIzaSyDkU4W01OimygxLlEXBhqrba3PglcV2224",
-authDomain: "searcher-key-sys.firebaseapp.com",
-projectId: "searcher-key-sys",
-storageBucket: "searcher-key-sys.firebasestorage.app",
-messagingSenderId: "500491200168",
-appId: "1:500491200168:web:91ae88fa17f8a8bb6f849d"
+  apiKey: "AIzaSyDkU4W01OimygxLlEXBhqrba3PglcV2224",
+  authDomain: "searcher-key-sys.firebaseapp.com",
+  projectId: "searcher-key-sys",
+  storageBucket: "searcher-key-sys.firebasestorage.app",
+  messagingSenderId: "500491200168",
+  appId: "1:500491200168:web:91ae88fa17f8a8bb6f849d"
 };
 
 const MASTER_KEY = "48ontop2323";
@@ -350,90 +132,83 @@ let loggedIn = false;
 let isAdmin = false;
 
 function formatTimestamp(ts) {
-  // ts is a Firestore Timestamp
   const date = ts.toDate();
-  return date.toLocaleString(undefined, { 
+  return date.toLocaleString(undefined, {
     year: 'numeric', month: 'short', day: 'numeric',
     hour: '2-digit', minute: '2-digit', second: '2-digit',
-    hour12: false 
+    hour12: false
   });
 }
 
 async function checkKeyValid(inputKey) {
-  if(inputKey === MASTER_KEY) return true; // master key always valid
+  if (inputKey === MASTER_KEY) return true;
 
-  const now = Timestamp.now();
-  const q = query(keysCollection, 
-    where("key", "==", inputKey),
-    where("expireAt", ">", now)
-  );
+  const now = new Date();
+  const q = query(keysCollection, where("key", "==", inputKey));
   const snapshot = await getDocs(q);
-  return !snapshot.empty;
+
+  for (const doc of snapshot.docs) {
+    const data = doc.data();
+    if (data.expireAt && data.expireAt.toDate() > now) {
+      return true;
+    }
+  }
+  return false;
 }
 
 async function validateAccessKeyOrPassword(inputKey) {
-  const valid = await checkKeyValid(inputKey);
-  return valid;
+  return await checkKeyValid(inputKey);
 }
 
 async function loadWorkingKeys() {
   keysList.innerHTML = '';
-  const now = Timestamp.now();
-  const q = query(keysCollection, where("expireAt", ">", now));
-  const snapshot = await getDocs(q);
+  const now = new Date();
+  const snapshot = await getDocs(keysCollection);
 
-  if (snapshot.empty) {
-    keysList.innerHTML = '<li>No valid keys found.</li>';
-  } else {
-    snapshot.forEach(doc => {
-      const data = doc.data();
+  let anyValid = false;
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    if (data.expireAt && data.expireAt.toDate() > now) {
+      anyValid = true;
       const expFormatted = formatTimestamp(data.expireAt);
       keysList.innerHTML += `<li><span>${data.key}</span><span class="expireTime">Expires at: ${expFormatted}</span></li>`;
-    });
+    }
+  });
+
+  if (!anyValid) {
+    keysList.innerHTML = '<li>No valid keys found.</li>';
   }
 }
 
-// Handle login overlay submission for main site access
 submitAccessKeyBtn.addEventListener('click', async () => {
   const input = accessKeyInput.value.trim();
-  if(!input) {
+  if (!input) {
     keyErrorMessage.textContent = "Please enter an access key or admin password.";
     return;
   }
   keyErrorMessage.textContent = "";
   try {
     const valid = await validateAccessKeyOrPassword(input);
-    if(valid) {
+    if (valid) {
       loggedIn = true;
-      // If input is master key, mark admin true too
       isAdmin = (input === MASTER_KEY);
       sessionStorage.setItem('accessKey', input);
       initializeAfterLogin();
     } else {
       keyErrorMessage.textContent = "Invalid or expired key/password.";
     }
-  } catch(e) {
+  } catch (e) {
     keyErrorMessage.textContent = "Error validating key. Please try again.";
     console.error(e);
   }
 });
 
-// Initialize page after successful login
 async function initializeAfterLogin() {
   loginOverlay.style.display = 'none';
   container.style.display = 'block';
   adminBtn.style.display = 'block';
-
-  if(isAdmin) {
-    // Admin panel remains locked until clicked
-    // Admin login via separate password still required
-    // But user can access admin panel UI here
-  }
-
-  // Optional: you can also auto login to admin panel if master key
 }
 
-// Admin panel open
 adminBtn.addEventListener('click', () => {
   adminPanel.style.display = 'block';
   adminPasswordInput.value = '';
@@ -444,10 +219,9 @@ adminBtn.addEventListener('click', () => {
   adminPasswordInput.focus();
 });
 
-// Admin panel login submit
 loginAdminBtn.addEventListener('click', async () => {
   const pw = adminPasswordInput.value.trim();
-  if(pw === MASTER_KEY) {
+  if (pw === MASTER_KEY) {
     isAdmin = true;
     keyGeneratorDiv.style.display = 'block';
     workingKeysDiv.style.display = 'block';
@@ -459,132 +233,25 @@ loginAdminBtn.addEventListener('click', async () => {
   }
 });
 
-// Generate new key with 7 hours expiry
 generateKeyBtn.addEventListener('click', async () => {
-  generateKeyBtn.disabled = true;
-  newKeyDisplay.textContent = 'Generating...';
-
-  // Generate a random 12-character key (uppercase letters and digits)
-  function randomKey(length = 12) {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let result = '';
-    for(let i=0; i<length; i++) {
-      result += chars.charAt(Math.floor(Math.random()*chars.length));
-    }
-    return result;
-  }
-
-  const newKey = randomKey();
-  const expireAt = Timestamp.fromDate(new Date(Date.now() + 7*3600*1000)); // 7 hours from now
+  const newKey = Math.random().toString(36).substring(2, 10);
+  const expireTime = new Date();
+  expireTime.setHours(expireTime.getHours() + 7);
 
   try {
     await addDoc(keysCollection, {
       key: newKey,
-      expireAt: expireAt,
+      expireAt: Timestamp.fromDate(expireTime),
       createdAt: serverTimestamp()
     });
-    newKeyDisplay.textContent = newKey + " (Expires in 7 hours)";
+
+    newKeyDisplay.textContent = `New Key: ${newKey}`;
     await loadWorkingKeys();
-  } catch(e) {
-    newKeyDisplay.textContent = 'Error generating key.';
-    console.error(e);
+  } catch (e) {
+    console.error("Error generating key:", e);
+    newKeyDisplay.textContent = "Failed to generate key.";
   }
-  generateKeyBtn.disabled = false;
-});
-
-// Hide admin panel when clicking outside or pressing Escape
-window.addEventListener('click', (e) => {
-  if(e.target === adminPanel) {
-    adminPanel.style.display = 'none';
-    adminPanel.setAttribute('aria-hidden', 'true');
-    loginAdminBtn.style.display = 'inline-block';
-    keyGeneratorDiv.style.display = 'none';
-    newKeyDisplay.textContent = '';
-    workingKeysDiv.style.display = 'none';
-  }
-});
-window.addEventListener('keydown', (e) => {
-  if(e.key === 'Escape' && adminPanel.style.display === 'block') {
-    adminPanel.style.display = 'none';
-    adminPanel.setAttribute('aria-hidden', 'true');
-    loginAdminBtn.style.display = 'inline-block';
-    keyGeneratorDiv.style.display = 'none';
-    newKeyDisplay.textContent = '';
-    workingKeysDiv.style.display = 'none';
-  }
-});
-
-// On page load, check if sessionStorage has valid key to skip login overlay
-(async () => {
-  const savedKey = sessionStorage.getItem('accessKey');
-  if(savedKey) {
-    try {
-      const valid = await validateAccessKeyOrPassword(savedKey);
-      if(valid) {
-        loggedIn = true;
-        isAdmin = (savedKey === MASTER_KEY);
-        initializeAfterLogin();
-      }
-    } catch(e) {
-      console.warn("Failed to validate saved key:", e);
-    }
-  }
-})();
-
-// Search query generation logic (unchanged)
-const generateBtn = document.getElementById('generateBtn');
-const resultTextarea = document.getElementById('result');
-
-generateBtn.addEventListener('click', () => {
-  let keywords = document.getElementById('keywords').value.trim();
-  let excludeWords = document.getElementById('excludeWords').value.trim();
-  let siteSearch = document.getElementById('siteSearch').value.trim();
-  let fileType = document.getElementById('fileType').value.trim();
-  let searchExact = document.getElementById('searchExact').value.trim();
-  let intitle = document.getElementById('intitle').value.trim();
-  let inurl = document.getElementById('inurl').value.trim();
-  let excludeTerms = document.getElementById('excludeTerms').value.trim();
-
-  let queryParts = [];
-
-  if(keywords) {
-    let words = keywords.split(/\s+/);
-    queryParts.push(words.map(w => `"${w}"`).join(' OR '));
-  }
-  if(searchExact) {
-    queryParts.push(searchExact);
-  }
-  if(excludeWords) {
-    let words = excludeWords.split(/\s+/);
-    queryParts.push(words.map(w => `-${w}`).join(' '));
-  }
-  if(siteSearch) {
-    if(siteSearch.startsWith('.')) {
-      queryParts.push(`site:${siteSearch}`);
-    } else if(siteSearch.includes('.')) {
-      queryParts.push(`site:${siteSearch}`);
-    }
-  }
-  if(fileType) {
-    queryParts.push(`filetype:${fileType}`);
-  }
-  if(intitle) {
-    let words = intitle.split(/\s+/);
-    queryParts.push(words.map(w => `intitle:${w}`).join(' '));
-  }
-  if(inurl) {
-    let words = inurl.split(/\s+/);
-    queryParts.push(words.map(w => `inurl:${w}`).join(' '));
-  }
-  if(excludeTerms) {
-    let words = excludeTerms.split(/\s+/);
-    queryParts.push(words.map(w => `-${w}`).join(' '));
-  }
-
-  resultTextarea.value = queryParts.join(' ');
 });
 </script>
-
 </body>
 </html>
-
