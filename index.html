@@ -2,71 +2,122 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Advanced Google Search Builder</title>
+  <title>48 Searcher</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      padding: 2em;
-      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #0f0f11;
+      color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
+
     .container {
-      max-width: 600px;
-      margin: auto;
-      background: white;
-      padding: 2em;
-      border-radius: 8px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
-    }
-    label {
-      font-weight: bold;
-    }
-    input, select, textarea {
+      background-color: #1a1a1d;
+      padding: 2.5em;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
       width: 100%;
-      margin-bottom: 1em;
-      padding: 0.5em;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      max-width: 600px;
     }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5em;
+      color: #a86cff;
+      font-size: 2em;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.3em;
+      font-weight: 600;
+      color: #cccccc;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.7em;
+      margin-bottom: 1em;
+      border: 1px solid #444;
+      border-radius: 12px;
+      background-color: #2a2a2e;
+      color: #f0f0f0;
+      font-size: 1em;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #a86cff;
+      background-color: #2e2e34;
+    }
+
     button {
-      background-color: #007bff;
+      width: 100%;
+      padding: 0.8em;
+      background-color: #a86cff;
       color: white;
       border: none;
-      padding: 0.7em 1.2em;
-      border-radius: 6px;
+      border-radius: 12px;
+      font-size: 1em;
+      font-weight: 600;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
+
     button:hover {
-      background-color: #0056b3;
+      background-color: #925bf2;
     }
+
     .output {
-      margin-top: 1em;
-      background: #e9ecef;
+      margin-top: 1.5em;
+      background-color: #222;
       padding: 1em;
-      border-radius: 6px;
+      border-radius: 12px;
+      font-size: 0.95em;
+      color: #cccccc;
       word-break: break-all;
+    }
+
+    a {
+      color: #a86cff;
+      text-decoration: none;
+    }
+
+    code {
+      background: #333;
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-top: 0.5em;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Advanced Google Search Builder</h2>
-    
+    <h1>48 Searcher</h1>
+
     <label for="keywords">Keywords</label>
     <input type="text" id="keywords" placeholder="e.g. AI art generator">
 
-    <label for="exact">Exact Phrase (use quotes)</label>
-    <input type="text" id="exact" placeholder="e.g. 'open source'">
+    <label for="exact">Exact Phrase</label>
+    <input type="text" id="exact" placeholder="e.g. open source">
 
-    <label for="exclude">Words to Exclude</label>
+    <label for="exclude">Exclude Words</label>
     <input type="text" id="exclude" placeholder="e.g. free, scam">
 
-    <label for="site">Domain Extension / Site (e.g. .com, .edu, or full site)</label>
+    <label for="site">Domain Extension / Site</label>
     <input type="text" id="site" placeholder="e.g. .com or example.pages.dev">
 
-    <label for="inurl">In URL (must appear in URL)</label>
+    <label for="inurl">Must Be in URL</label>
     <input type="text" id="inurl" placeholder="e.g. login">
 
-    <label for="filetype">File Type (optional)</label>
+    <label for="filetype">File Type</label>
     <input type="text" id="filetype" placeholder="e.g. pdf, docx">
 
     <button onclick="generateSearch()">Generate Search</button>
@@ -99,10 +150,10 @@
       const searchURL = `https://www.google.com/search?q=${encodeURIComponent(fullQuery)}`;
 
       document.getElementById('output').innerHTML = `
-        <strong>Generated Search URL:</strong><br>
+        <strong>🔎 Search URL:</strong><br>
         <a href="${searchURL}" target="_blank">${searchURL}</a>
         <br><br>
-        <strong>Search Query:</strong><br>
+        <strong>🧠 Google Query:</strong><br>
         <code>${fullQuery}</code>
       `;
     }
