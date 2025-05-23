@@ -1,81 +1,111 @@
-import React, { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { motion } from "framer-motion";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Advanced Google Search Builder</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2em;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 2em;
+      border-radius: 8px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+    }
+    label {
+      font-weight: bold;
+    }
+    input, select, textarea {
+      width: 100%;
+      margin-bottom: 1em;
+      padding: 0.5em;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 0.7em 1.2em;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .output {
+      margin-top: 1em;
+      background: #e9ecef;
+      padding: 1em;
+      border-radius: 6px;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Advanced Google Search Builder</h2>
+    
+    <label for="keywords">Keywords</label>
+    <input type="text" id="keywords" placeholder="e.g. AI art generator">
 
-export default function Home() {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
+    <label for="exact">Exact Phrase (use quotes)</label>
+    <input type="text" id="exact" placeholder="e.g. 'open source'">
 
-  const fakeCloudflareSites = [
-    "fungames.pages.dev",
-    "devtools.pages.dev",
-    "cloudpaste.pages.dev",
-    "blueprint.pages.dev",
-    "gamehub.pages.dev",
-    "mydiary.pages.dev",
-    "aestheticart.pages.dev"
-  ];
+    <label for="exclude">Words to Exclude</label>
+    <input type="text" id="exclude" placeholder="e.g. free, scam">
 
-  const searchSites = () => {
-    setLoading(true);
-    setTimeout(() => {
-      const filtered = fakeCloudflareSites.filter(site =>
-        site.includes(query.toLowerCase())
-      );
-      setResults(filtered);
-      setLoading(false);
-    }, 1000);
-  };
+    <label for="site">Domain Extension / Site (e.g. .com, .edu, or full site)</label>
+    <input type="text" id="site" placeholder="e.g. .com or example.pages.dev">
 
-  return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-black p-6 text-white">
-      <div className="max-w-2xl mx-auto text-center space-y-6">
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-4xl font-bold text-blue-300"
-        >
-          Discover Cloudflare Pages
-        </motion.h1>
-        <p className="text-purple-300">
-          A search engine for sites ending in <code>.pages.dev</code>
-        </p>
-        <div className="flex items-center gap-4 justify-center">
-          <Input
-            className="w-full max-w-md text-black"
-            placeholder="Search for games, tools, art..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <Button onClick={searchSites}>Search</Button>
-        </div>
-        {loading && <p className="text-blue-400">Searching...</p>}
-        {!loading && results.length > 0 && (
-          <div className="space-y-2 mt-4">
-            {results.map((site, idx) => (
-              <Card key={idx} className="bg-purple-800 text-white">
-                <CardContent>
-                  <a
-                    href={`https://${site}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:underline text-blue-200"
-                  >
-                    {site}
-                  </a>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-        {!loading && query && results.length === 0 && (
-          <p className="text-red-400">No matching pages found.</p>
-        )}
-      </div>
-    </main>
-  );
-}
+    <label for="inurl">In URL (must appear in URL)</label>
+    <input type="text" id="inurl" placeholder="e.g. login">
+
+    <label for="filetype">File Type (optional)</label>
+    <input type="text" id="filetype" placeholder="e.g. pdf, docx">
+
+    <button onclick="generateSearch()">Generate Search</button>
+
+    <div class="output" id="output"></div>
+  </div>
+
+  <script>
+    function generateSearch() {
+      const keywords = document.getElementById('keywords').value.trim();
+      const exact = document.getElementById('exact').value.trim();
+      const exclude = document.getElementById('exclude').value.trim();
+      const site = document.getElementById('site').value.trim();
+      const inurl = document.getElementById('inurl').value.trim();
+      const filetype = document.getElementById('filetype').value.trim();
+
+      let queryParts = [];
+
+      if (keywords) queryParts.push(keywords);
+      if (exact) queryParts.push(`"${exact}"`);
+      if (exclude) {
+        const words = exclude.split(',').map(w => `-${w.trim()}`);
+        queryParts.push(...words);
+      }
+      if (site) queryParts.push(`site:${site}`);
+      if (inurl) queryParts.push(`inurl:${inurl}`);
+      if (filetype) queryParts.push(`filetype:${filetype}`);
+
+      const fullQuery = queryParts.join(' ');
+      const searchURL = `https://www.google.com/search?q=${encodeURIComponent(fullQuery)}`;
+
+      document.getElementById('output').innerHTML = `
+        <strong>Generated Search URL:</strong><br>
+        <a href="${searchURL}" target="_blank">${searchURL}</a>
+        <br><br>
+        <strong>Search Query:</strong><br>
+        <code>${fullQuery}</code>
+      `;
+    }
+  </script>
+</body>
+</html>
