@@ -39,6 +39,7 @@ box-shadow:
 inset 0 0 20px 1px #6c4dc9;
 position: relative;
 z-index: 2;
+display: none;
 }
 h1 {
 text-align: center;
@@ -122,6 +123,7 @@ inset 0 -2px 5px #6c4dc9;
 transition: background 0.3s ease;
 z-index: 10;
 width: auto;
+display: none;
 }
 #adminBtn:hover {
 background: #633ec9;
@@ -318,7 +320,6 @@ keysList.innerHTML = '';
 const now = Timestamp.now();
 const q = query(keysCollection, where("expireAt", ">", now));
 const snapshot = await getDocs(q);
-
 if (snapshot.empty) {
 keysList.innerHTML = '<li>No valid keys found.</li>';
 } else {
@@ -328,6 +329,30 @@ keysList.innerHTML += `<li>${data.key}</li>`;
 });
 }
 }
+
+async function checkAccessKey() {
+let accessGranted = false;
+while (!accessGranted) {
+const key = prompt("Enter your access key:");
+if (!key) continue;
+if (key === MASTER_KEY) {
+accessGranted = true;
+break;
+}
+const now = Timestamp.now();
+const q = query(keysCollection, where("key", "==", key), where("expireAt", ">", now));
+const snapshot = await getDocs(q);
+if (!snapshot.empty) {
+accessGranted = true;
+break;
+}
+alert("Invalid or expired key. Try again.");
+}
+document.getElementById("container").style.display = "block";
+document.getElementById("adminBtn").style.display = "block";
+}
+
+checkAccessKey();
 
 window.addEventListener('DOMContentLoaded', () => {
 const generateBtn = document.getElementById('generateBtn');
