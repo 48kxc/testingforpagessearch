@@ -14,7 +14,6 @@
     overflow-x: hidden;
     position: relative;
   }
-  /* Starry background */
   body::before {
     content: "";
     position: fixed;
@@ -29,8 +28,6 @@
     from { background-position: 0 0; }
     to { background-position: 1000px 1000px; }
   }
-
-  /* Container */
   #container {
     max-width: 700px;
     background: #2b1a58;
@@ -43,7 +40,6 @@
     position: relative;
     z-index: 2;
   }
-
   h1 {
     text-align: center;
     font-weight: 600;
@@ -52,7 +48,6 @@
     margin-bottom: 30px;
     text-shadow: 0 0 5px #bf9fff;
   }
-
   label {
     display: block;
     margin-top: 18px;
@@ -60,7 +55,6 @@
     font-weight: 600;
     color: #d2c9f7;
   }
-
   input[type=text], select {
     width: 100%;
     padding: 10px 15px;
@@ -78,7 +72,6 @@
     box-shadow: 0 0 10px #b79bff;
     background: #4b3a80;
   }
-
   button {
     margin-top: 25px;
     width: 100%;
@@ -98,7 +91,6 @@
   button:hover {
     background: linear-gradient(145deg, #9f7dff, #6328e1);
   }
-
   textarea {
     margin-top: 25px;
     width: 100%;
@@ -113,8 +105,6 @@
     box-shadow: inset 0 0 8px #6a54ac;
     resize: none;
   }
-
-  /* Admin Panel Button */
   #adminBtn {
     position: fixed;
     top: 20px;
@@ -131,12 +121,11 @@
       inset 0 -2px 5px #6c4dc9;
     transition: background 0.3s ease;
     z-index: 10;
+    width: auto;
   }
   #adminBtn:hover {
     background: #633ec9;
   }
-
-  /* Admin Panel Modal */
   #adminPanel {
     position: fixed;
     top: 50%; left: 50%;
@@ -185,10 +174,8 @@
 </head>
 <body>
 
-<!-- Admin Panel Button -->
 <button id="adminBtn">Admin Panel</button>
 
-<!-- Admin Panel -->
 <div id="adminPanel">
   <input type="password" id="adminPassword" placeholder="Enter admin password" />
   <button id="loginAdmin">Login</button>
@@ -201,7 +188,6 @@
 <div id="container">
   <h1>48 Searcher</h1>
 
-  <!-- Advanced Google Search UI -->
   <label for="keywords">Keywords (space separated)</label>
   <input type="text" id="keywords" placeholder="e.g. openAI chatbot" />
 
@@ -215,7 +201,7 @@
   <input type="text" id="fileType" placeholder="e.g. pdf, docx, ppt" />
 
   <label for="searchExact">Exact Phrase</label>
-  <input type="text" id="searchExact" placeholder="e.g. &quot;machine learning&quot;" />
+  <input type="text" id="searchExact" placeholder='e.g. "machine learning"' />
 
   <label for="intitle">Words in Title</label>
   <input type="text" id="intitle" placeholder="e.g. security" />
@@ -231,112 +217,110 @@
   <textarea id="result" readonly placeholder="Your advanced search query will appear here..."></textarea>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+<!-- Firebase 9 Modular SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp, Timestamp, query, where, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-<script>
-  // Firebase config - fill with your own
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    // YOUR FIREBASE CONFIG HERE
+    apiKey: "AIzaSyDkU4W01OimygxLlEXBhqrba3PglcV2224",
+    authDomain: "searcher-key-sys.firebaseapp.com",
+    projectId: "searcher-key-sys",
+    storageBucket: "searcher-key-sys.firebasestorage.app",
+    messagingSenderId: "500491200168",
+    appId: "1:500491200168:web:91ae88fa17f8a8bb6f849d"
   };
 
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
+  const MASTER_KEY = "48ontop2323";
 
-  // Elements
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const keysCollection = collection(db, "accessKeys");
+
   const adminBtn = document.getElementById('adminBtn');
   const adminPanel = document.getElementById('adminPanel');
-  const loginAdminBtn = document.getElementById('loginAdmin');
   const adminPasswordInput = document.getElementById('adminPassword');
-  const keyGenerator = document.getElementById('keyGenerator');
+  const loginAdminBtn = document.getElementById('loginAdmin');
+  const keyGeneratorDiv = document.getElementById('keyGenerator');
   const generateKeyBtn = document.getElementById('generateKey');
   const newKeyDisplay = document.getElementById('newKey');
 
-  // Admin password constants
-  const MASTER_KEY = "48ontop2323";
-
-  // Show admin panel modal
   adminBtn.addEventListener('click', () => {
     adminPanel.style.display = 'block';
     adminPasswordInput.value = '';
-    keyGenerator.style.display = 'none';
+    keyGeneratorDiv.style.display = 'none';
     newKeyDisplay.textContent = '';
   });
 
-  // Admin login check
-  loginAdminBtn.addEventListener('click', () => {
-    const input = adminPasswordInput.value.trim();
-    if (input === MASTER_KEY) {
-      keyGenerator.style.display = 'block';
-      alert('Admin access granted!');
+  loginAdminBtn.addEventListener('click', async () => {
+    const entered = adminPasswordInput.value.trim();
+    if (entered === MASTER_KEY) {
+      keyGeneratorDiv.style.display = 'block';
+      alert('Admin login successful.');
     } else {
-      alert('Incorrect admin password.');
+      alert('Wrong admin password!');
+      keyGeneratorDiv.style.display = 'none';
+      newKeyDisplay.textContent = '';
     }
   });
 
-  // Generate a random unique key string
-  function generateUniqueKey() {
-    return 'key-' + Math.random().toString(36).substring(2, 11);
+  // Generate a random key
+  function generateRandomKey() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let key = '';
+    for(let i=0; i<16; i++) {
+      key += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return key;
   }
 
-  // Store generated key in Firestore with 7-hour expiry
   generateKeyBtn.addEventListener('click', async () => {
-    const key = generateUniqueKey();
-    const expireAt = new Date(Date.now() + 7 * 60 * 60 * 1000); // 7 hours from now
-
+    const newKey = generateRandomKey();
+    const expireAt = Timestamp.fromDate(new Date(Date.now() + 7 * 3600 * 1000)); // 7 hours from now
     try {
-      await db.collection('accessKeys').doc(key).set({
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        expireAt: firebase.firestore.Timestamp.fromDate(expireAt)
-      });
-      newKeyDisplay.textContent = `New Access Key: ${key} (Expires in 7 hours)`;
-    } catch (error) {
-      console.error('Error generating key:', error);
-      alert('Failed to generate key. See console.');
+      await addDoc(keysCollection, { key: newKey, expireAt });
+      newKeyDisplay.textContent = `Generated key: ${newKey} (valid for 7 hours)`;
+    } catch (e) {
+      alert('Error saving key: ' + e.message);
     }
   });
 
-  // === Advanced Search Generator ===
-  const generateBtn = document.getElementById('generateBtn');
-  const result = document.getElementById('result');
+  // Search generator code
+  window.addEventListener('DOMContentLoaded', () => {
+    const generateBtn = document.getElementById('generateBtn');
+    const result = document.getElementById('result');
+    const keywords = document.getElementById('keywords');
+    const excludeWords = document.getElementById('excludeWords');
+    const siteSearch = document.getElementById('siteSearch');
+    const fileType = document.getElementById('fileType');
+    const searchExact = document.getElementById('searchExact');
+    const intitle = document.getElementById('intitle');
+    const inurl = document.getElementById('inurl');
+    const excludeTerms = document.getElementById('excludeTerms');
 
-  function sanitizeInput(str) {
-    return str.trim();
-  }
+    generateBtn.addEventListener('click', () => {
+      let queryParts = [];
+      if (keywords.value.trim()) queryParts.push(keywords.value.trim());
+      if (searchExact.value.trim()) queryParts.push(`"${searchExact.value.trim()}"`);
+      if (siteSearch.value.trim()) queryParts.push(`site:${siteSearch.value.trim()}`);
+      if (fileType.value.trim()) queryParts.push(`filetype:${fileType.value.trim()}`);
+      if (intitle.value.trim()) queryParts.push(`intitle:${intitle.value.trim()}`);
+      if (inurl.value.trim()) queryParts.push(`inurl:${inurl.value.trim()}`);
+      if (excludeWords.value.trim()) {
+        const excludeArr = excludeWords.value.trim().split(/\s+/);
+        excludeArr.forEach(word => queryParts.push(`-${word}`));
+      }
+      if (excludeTerms.value.trim()) {
+        const excludeArr2 = excludeTerms.value.trim().split(/\s+/);
+        excludeArr2.forEach(word => queryParts.push(`-${word}`));
+      }
 
-  generateBtn.addEventListener('click', () => {
-    const keywords = sanitizeInput(document.getElementById('keywords').value);
-    const excludeWords = sanitizeInput(document.getElementById('excludeWords').value);
-    const siteSearch = sanitizeInput(document.getElementById('siteSearch').value);
-    const fileType = sanitizeInput(document.getElementById('fileType').value);
-    const searchExact = sanitizeInput(document.getElementById('searchExact').value);
-    const intitle = sanitizeInput(document.getElementById('intitle').value);
-    const inurl = sanitizeInput(document.getElementById('inurl').value);
-    const excludeTerms = sanitizeInput(document.getElementById('excludeTerms').value);
-
-    let queryParts = [];
-
-    if (keywords) queryParts.push(keywords.split(/\s+/).map(w => `"${w}"`).join(' '));
-    if (searchExact) queryParts.push(`"${searchExact.replace(/"/g, '')}"`);
-    if (excludeWords) queryParts.push(excludeWords.split(/\s+/).map(w => `-${w}`).join(' '));
-    if (siteSearch) queryParts.push(`site:${siteSearch}`);
-    if (fileType) queryParts.push(`filetype:${fileType}`);
-    if (intitle) queryParts.push(`intitle:${intitle}`);
-    if (inurl) queryParts.push(`inurl:${inurl}`);
-    if (excludeTerms) queryParts.push(excludeTerms.split(/\s+/).map(w => `-${w}`).join(' '));
-
-    const finalQuery = queryParts.join(' ');
-    result.value = finalQuery;
+      const finalQuery = queryParts.join(' ');
+      result.value = finalQuery;
+    });
   });
 
-  // -- Optional: You can add access control for site usage by keys here if needed --
-  // For example, prompt user to enter a key, then verify it against Firebase OR check for MASTER_KEY.
 </script>
 
 </body>
